@@ -134,4 +134,5 @@ Nested block comments and interpolated strings _are_ expressible — via self-in
   overlap the columns they point at.
 - Every defect fixed gets a unit test that fails before the fix.
 - Scope names are a contract. Adding one is easy; removing one breaks every theme that keys
-  on it. Document each in `docs/SCOPES.md` at the same time.
+  on it. Document each in `docs/SCOPES.md` at the same time — `npm run check:scopes`
+  enforces this, because requiring it in prose is what let it drift in the first place.

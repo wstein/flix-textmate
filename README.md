@@ -47,7 +47,7 @@ Individual steps:
 
 ```bash
 npm run typecheck    # tsc --noEmit
-npm run lint         # eslint, then the structural grammar lint
+npm run lint         # eslint, the structural grammar lint, then the scope-doc check
 npm run fmt          # prettier --write, then eslint --fix
 npm run check:build  # rebuild and fail if the committed JSON changed
 npm run test:unit    # inline scope assertions, tests/unit/**

@@ -41,6 +41,9 @@ jobs:
       - name: Unit tests
         run: npm run test:unit
 
+      - name: Scope documentation is complete
+        run: npm run check:scopes
+
       - name: Unscoped-identifier check
         run: npm run test:unscoped
 

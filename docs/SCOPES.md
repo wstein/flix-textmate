@@ -80,6 +80,22 @@ wrong in both directions, because `!` and `$` are not word characters.
 Alternatives within a rule are sorted longest-first: Oniguruma alternation returns the first
 match, not the longest, so `choose` before `choose*` would leave the `*` unscoped.
 
+## Comments
+
+`Lexer.acceptLineOrDocComment` counts the slashes after the leading `//`: exactly one more
+makes a doc comment, so `///` is documentation but `////` is not. The grammar this replaces
+folds every `///` line into `comment.line.double-slash`, which is why a doc comment scope
+exists here at all.
+
+| Scope                                       | Applies to                            |
+| ------------------------------------------- | ------------------------------------- |
+| `comment.line.double-slash.flix`            | `//`, and `////` or longer            |
+| `comment.line.documentation.flix`           | exactly `///`                         |
+| `comment.block.flix`                        | `/* … */`, which nests                |
+| `punctuation.definition.comment.flix`       | the leading slashes of a line comment |
+| `punctuation.definition.comment.begin.flix` | `/*`                                  |
+| `punctuation.definition.comment.end.flix`   | `*/`                                  |
+
 ## Literals
 
 | Scope                            | Applies to                                          |
@@ -159,3 +175,76 @@ Enforced by `scripts/lint-grammar.mjs` and `scripts/audit-corpus.mjs`:
   really are single-line; for chars this is a documented deviation, since honouring the
   lexer's unbounded scan would let one stray apostrophe paint the rest of the file.
 - No file in the corpus may end with a rule still open. Currently zero across 890 files.
+
+## Complete scope index
+
+Every scope the grammar emits. `scripts/check-scopes-documented.mjs` fails if one is missing
+from this document, because a scope absent from the contract is one a theme author cannot
+discover.
+
+| Scope                                                   |
+| ------------------------------------------------------- |
+| `comment.block.flix`                                    |
+| `comment.line.documentation.flix`                       |
+| `comment.line.double-slash.flix`                        |
+| `constant.character.escape.flix`                        |
+| `constant.language.boolean.flix`                        |
+| `constant.language.hole.flix`                           |
+| `constant.language.null.flix`                           |
+| `constant.numeric.flix`                                 |
+| `constant.numeric.hex.flix`                             |
+| `entity.name.function.flix`                             |
+| `entity.name.namespace.flix`                            |
+| `entity.name.type.flix`                                 |
+| `keyword.control.conditional.flix`                      |
+| `keyword.control.datalog.flix`                          |
+| `keyword.control.flix`                                  |
+| `keyword.control.import.flix`                           |
+| `keyword.operator.accessor.flix`                        |
+| `keyword.operator.arrow.flix`                           |
+| `keyword.operator.cast.flix`                            |
+| `keyword.operator.datalog.flix`                         |
+| `keyword.operator.effect.flix`                          |
+| `keyword.operator.flix`                                 |
+| `keyword.operator.logical.flix`                         |
+| `keyword.operator.new.flix`                             |
+| `keyword.operator.word.flix`                            |
+| `keyword.other.debug.flix`                              |
+| `keyword.other.flix`                                    |
+| `keyword.other.regexp.flix`                             |
+| `meta.embedded.line.flix`                               |
+| `punctuation.accessor.flix`                             |
+| `punctuation.definition.annotation.flix`                |
+| `punctuation.definition.builtin.begin.flix`             |
+| `punctuation.definition.builtin.end.flix`               |
+| `punctuation.definition.comment.begin.flix`             |
+| `punctuation.definition.comment.end.flix`               |
+| `punctuation.definition.comment.flix`                   |
+| `punctuation.definition.infix.flix`                     |
+| `punctuation.definition.string.begin.flix`              |
+| `punctuation.definition.string.end.flix`                |
+| `punctuation.definition.template-expression.begin.flix` |
+| `punctuation.definition.template-expression.end.flix`   |
+| `punctuation.definition.variable.flix`                  |
+| `punctuation.section.braces.flix`                       |
+| `punctuation.section.brackets.flix`                     |
+| `punctuation.section.datalog.begin.flix`                |
+| `punctuation.section.extensible.begin.flix`             |
+| `punctuation.section.extensible.end.flix`               |
+| `punctuation.section.parens.flix`                       |
+| `punctuation.separator.colon.flix`                      |
+| `punctuation.separator.comma.flix`                      |
+| `punctuation.terminator.flix`                           |
+| `storage.modifier.flix`                                 |
+| `storage.type.annotation.flix`                          |
+| `storage.type.flix`                                     |
+| `string.quoted.double.flix`                             |
+| `string.quoted.single.flix`                             |
+| `string.regexp.flix`                                    |
+| `support.function.builtin.flix`                         |
+| `support.type.builtin.flix`                             |
+| `support.type.primitive.flix`                           |
+| `variable.language.wildcard.flix`                       |
+| `variable.other.escaped.flix`                           |
+| `variable.other.math.flix`                              |
+| `variable.other.member.flix`                            |
