@@ -1,4 +1,4 @@
-# flix-tm-grammar
+# flix-textmate
 
 A TextMate grammar for the [Flix](https://flix.dev) programming language, authored in
 TypeScript and emitted as `syntaxes/flix.tmLanguage.json`.

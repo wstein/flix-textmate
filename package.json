@@ -1,5 +1,5 @@
 {
-  "name": "flix-tm-grammar",
+  "name": "flix-textmate",
   "version": "0.1.1",
   "description": "TextMate grammar for the Flix programming language",
   "type": "module",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wstein/flix-tm-grammar.git"
+    "url": "git+https://github.com/wstein/flix-textmate.git"
   },
   "keywords": [
     "flix",
