@@ -1,0 +1,85 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "copyright_notice": "Copyright 2020 Stephen Tetley, Magnus Madsen; Copyright 2026 Werner Stein",
+  "license": "Apache License, Version 2.0",
+  "name": "Flix",
+  "scopeName": "source.flix",
+  "fileTypes": [
+    "flix"
+  ],
+  "patterns": [
+    {
+      "include": "#comments"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "include": "#block-comment"
+        },
+        {
+          "include": "#doc-comment"
+        },
+        {
+          "include": "#line-comment"
+        }
+      ]
+    },
+    "block-comment": {
+      "comment": "Nests, per Lexer.acceptBlockComment, via the self-include below.",
+      "name": "comment.block.flix",
+      "begin": "/\\*",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.comment.begin.flix"
+        }
+      },
+      "end": "\\*/",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.comment.end.flix"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#block-comment"
+        }
+      ]
+    },
+    "doc-comment": {
+      "comment": "Exactly three slashes. Lexer.acceptLineOrDocComment, slashCount == 1.",
+      "match": "(///)(?!/).*$",
+      "name": "comment.line.documentation.flix",
+      "captures": {
+        "1": {
+          "name": "punctuation.definition.comment.flix"
+        }
+      }
+    },
+    "line-comment": {
+      "patterns": [
+        {
+          "comment": "Two slashes not followed by a third.",
+          "match": "(//)(?!/).*$",
+          "name": "comment.line.double-slash.flix",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.comment.flix"
+            }
+          }
+        },
+        {
+          "comment": "Four or more slashes: not documentation, per the slash count above.",
+          "match": "(/{4,}).*$",
+          "name": "comment.line.double-slash.flix",
+          "captures": {
+            "1": {
+              "name": "punctuation.definition.comment.flix"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

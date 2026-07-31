@@ -1,0 +1,53 @@
+{
+  "name": "flix-tm-grammar",
+  "version": "0.1.0",
+  "description": "TextMate grammar for the Flix programming language",
+  "type": "module",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Werner Stein",
+    "email": "claude@wstein.de"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wstein/flix-tm-grammar.git"
+  },
+  "keywords": [
+    "flix",
+    "textmate",
+    "tmlanguage",
+    "syntax-highlighting"
+  ],
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "files": [
+    "syntaxes/flix.tmLanguage.json"
+  ],
+  "scripts": {
+    "build": "node src/typescript/GenerateTmLanguageFile.ts",
+    "check:build": "npm run build && git diff --exit-code -- syntaxes/flix.tmLanguage.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . && npm run lint:grammar",
+    "lint:grammar": "node scripts/lint-grammar.mjs",
+    "fmt": "prettier --write . && eslint --fix .",
+    "fmt:check": "prettier --check .",
+    "test": "npm run test:unit",
+    "test:unit": "vscode-tmgrammar-test -g syntaxes/flix.tmLanguage.json 'tests/unit/**/*.test.flix'",
+    "test:snap": "vscode-tmgrammar-snap --config tests/tmgrammar.config.json -g syntaxes/flix.tmLanguage.json 'tests/snap/**/*.test.flix'",
+    "update:snap": "vscode-tmgrammar-snap --updateSnapshot --config tests/tmgrammar.config.json -g syntaxes/flix.tmLanguage.json 'tests/snap/**/*.test.flix'",
+    "verify": "npm-run-all -c typecheck lint check:build test:unit test:snap"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^22.10.2",
+    "ajv": "^8.17.1",
+    "eslint": "^9.39.1",
+    "npm-run-all2": "^8.0.4",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.19.0",
+    "vscode-tmgrammar-test": "^0.1.3"
+  }
+}

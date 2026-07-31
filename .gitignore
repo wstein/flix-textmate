@@ -1,0 +1,6 @@
+node_modules/
+*.log
+.DS_Store
+
+# Scratch space for throwaway .flix snippets; keep the corpus out of the repo.
+.scratch/

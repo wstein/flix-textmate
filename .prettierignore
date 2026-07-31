@@ -1,0 +1,5 @@
+node_modules/
+src/schemas/tmlanguage.json
+syntaxes/flix.tmLanguage.json
+tests/snap/
+LICENSE.md

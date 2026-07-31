@@ -1,0 +1,106 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## What this is
+
+A TextMate grammar for [Flix](https://flix.dev), authored in TypeScript and emitted as
+`syntaxes/flix.tmLanguage.json`. It is a **drop-in replacement** for the grammar at
+https://github.com/flix/textmate, which GitHub Linguist vendors as the provider of
+`source.flix`. Preserve the file name, the `scopeName`, and the non-standard
+`copyright_notice` / `license` keys — those are what make the artifact upstreamable.
+
+Note that the official VS Code extension (`flix/vscode-flix`) declares `"grammars": []` and
+highlights via LSP semantic tokens only. This grammar is the base layer under that, and the
+only highlighting available on github.com, in Shiki-rendered docs, and before the LSP boots.
+
+## Commands
+
+```bash
+npm run build        # TypeScript -> syntaxes/flix.tmLanguage.json
+npm run verify       # typecheck + lint + check:build + test:unit + test:snap
+npm run check:build  # rebuild and fail if the committed JSON changed
+npm run fmt          # prettier --write, then eslint --fix
+npm run test:unit    # inline scope assertions
+npm run test:snap    # full-tokenization snapshots
+npm run update:snap  # rewrite snapshots (review the diff!)
+```
+
+Run `npm run fmt && npm run verify` before every commit.
+
+`syntaxes/flix.tmLanguage.json` is generated **and committed**. CI runs `check:build`, so a
+grammar edit that is not rebuilt fails rather than shipping stale JSON. Never hand-edit the
+JSON.
+
+## Source of truth
+
+Do not write Flix lexical rules from memory. The reference compiler at
+`~/github.com/wstein/flix-fork/main/src/ca/uwaterloo/flix/language/` is authoritative:
+
+| File                  | What to take from it                                         |
+| --------------------- | ------------------------------------------------------------ |
+| `phase/Lexer.scala`   | tokenization: literals, escapes, comments, character classes |
+| `ast/TokenKind.scala` | the exhaustive token list                                    |
+| `phase/Parser2.scala` | where a name may appear, and in which case                   |
+| `phase/Weeder2.scala` | the annotation table (`visitAnnotation`)                     |
+
+Follow the **lexer**, not the weeder. Flix lexes more than it accepts and rejects the rest
+later; permissiveness keeps highlighting stable in a file that does not compile.
+
+The previous grammar's defects almost all trace to violating this: it declares seven
+keywords that are not in `Lexer.Keywords` (`dbg`, `typematch`, `resume`, `branch`,
+`jumpto`, `without`, `opaque`) and one annotation that is not in `Weeder2.visitAnnotation`
+(`@Internal`). See `docs/DEFECTS.md`.
+
+## Architecture
+
+- `src/typescript/TmLanguage.ts` — hand-rolled model of the tmLanguage format. Deliberately
+  not a dependency: the types are public schema, and taking a third-party package for the
+  _definition_ of our published artifact buys little and risks churn. `ScopeName` is
+  `` `${string}.flix` ``, which makes an unsuffixed scope a compile error.
+- `src/typescript/FlixTmLanguage.ts` — the grammar. The only hand-written rule source.
+- `src/typescript/GenerateTmLanguageFile.ts` — validates against `src/schemas/tmlanguage.json`
+  with AJV, then writes the JSON. Exits non-zero on validation failure and writes only after
+  validation succeeds, so a failed build leaves the previous artifact intact.
+- `scripts/lint-grammar.mjs` — structural lint over the emitted JSON.
+
+### Grammar conventions
+
+- **Rule order is semantics.** TextMate picks the leftmost match and breaks ties by array
+  order. The previous grammar lists `literal_dec` before `literal_hex`, so `0x1F` tokenizes
+  as `0` plus an unscoped `x1F`. Put the longer/more specific literal rule first.
+- **Every `begin` needs a line-anchored `end`.** `Lexer.acceptString` returns
+  `UnterminatedString` on `\n`, so strings, chars, and regexes are single-line. A `begin`
+  whose `end` never fires paints the rest of the file. `scripts/lint-grammar.mjs` enforces
+  this; genuinely multi-line rules go in its `ALLOWED_MULTILINE` map **with a reason**.
+- **No call-site heuristics.** TextMate cannot distinguish a function call from a
+  constructor from a variable without a parser. Scope declarations, literals, comments, and
+  the case-determined name classes that `Parser2` actually mandates; leave expression-position
+  identifiers bare for the LSP's semantic tokens to layer over.
+- **Standard scope taxonomy.** `keyword.control.*`, `keyword.operator.*`, `storage.type.*`,
+  `storage.modifier.*`, `punctuation.*`, `entity.name.*`. One deliberate extension: a
+  `.datalog.` segment, because a documentation site plausibly wants to tint the Datalog
+  sub-language. Invented segments that no theme keys on are untestable as intent — do not
+  add more.
+- **Every scope ends in `.flix`.** Enforced by `ScopeName`.
+
+### Relationship to tree-sitter-flix
+
+`~/github.com/wstein/tree-sitter-flix` is a sibling project with the same source of truth
+and a `queries/highlights.scm`. Do **not** copy that file here — it is coupled to node names
+in that repository's `grammar.js` and cannot be validated without its parser. The shared
+artifact is the lexicon manifest extracted from `Lexer.scala`.
+
+Some things tree-sitter handles with an external C scanner are simply not expressible here:
+the `.` trichotomy (qualified-name separator vs. Datalog constraint terminator) needs to
+know whether an enclosing constraint is open, which a regex stack machine cannot track.
+Nested block comments and interpolated strings _are_ expressible — via self-include and
+`begin`/`end` respectively.
+
+## Conventions
+
+- Conventional Commits; the type reflects the primary purpose of the change (`feat` for new
+  scope coverage, `fix` for tokenization corrections, `chore`/`ci` for tooling).
+- Fixture lines in `tests/` are indented four spaces so assertion `//` prefixes do not
+  overlap the columns they point at.
+- Every defect fixed gets a unit test that fails before the fix.

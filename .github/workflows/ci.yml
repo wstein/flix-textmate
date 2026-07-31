@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Format check
+        run: npm run fmt:check
+
+      - name: Lint
+        run: npm run lint
+
+      # Fails if syntaxes/flix.tmLanguage.json differs from what the TypeScript
+      # source produces, so the committed artifact can never drift from its source.
+      - name: Grammar is up to date
+        run: npm run check:build
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Snapshot tests
+        run: npm run test:snap

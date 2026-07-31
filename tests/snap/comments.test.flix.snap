@@ -1,0 +1,27 @@
+>    // a plain line comment
+#^^^^ source.flix
+#    ^^ source.flix comment.line.double-slash.flix punctuation.definition.comment.flix
+#      ^^^^^^^^^^^^^^^^^^^^^ source.flix comment.line.double-slash.flix
+>    /// a doc comment
+#^^^^ source.flix
+#    ^^^ source.flix comment.line.documentation.flix punctuation.definition.comment.flix
+#       ^^^^^^^^^^^^^^ source.flix comment.line.documentation.flix
+>    //// four slashes
+#^^^^ source.flix
+#    ^^^^ source.flix comment.line.double-slash.flix punctuation.definition.comment.flix
+#        ^^^^^^^^^^^^^ source.flix comment.line.double-slash.flix
+>    /* a block comment */
+#^^^^ source.flix
+#    ^^ source.flix comment.block.flix punctuation.definition.comment.begin.flix
+#      ^^^^^^^^^^^^^^^^^ source.flix comment.block.flix
+#                       ^^ source.flix comment.block.flix punctuation.definition.comment.end.flix
+>    /* outer /* inner */ still outer */
+#^^^^ source.flix
+#    ^^ source.flix comment.block.flix punctuation.definition.comment.begin.flix
+#      ^^^^^^^ source.flix comment.block.flix
+#             ^^ source.flix comment.block.flix comment.block.flix punctuation.definition.comment.begin.flix
+#               ^^^^^^^ source.flix comment.block.flix comment.block.flix
+#                      ^^ source.flix comment.block.flix comment.block.flix punctuation.definition.comment.end.flix
+#                        ^^^^^^^^^^^^^ source.flix comment.block.flix
+#                                     ^^ source.flix comment.block.flix punctuation.definition.comment.end.flix
+>

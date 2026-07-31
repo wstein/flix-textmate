@@ -1,0 +1,19 @@
+{
+  "comment": "Language/grammar association for vscode-tmgrammar-snap, which resolves a fixture's scope from its file extension. This repository publishes a grammar rather than a VS Code extension, so the mapping lives here instead of in package.json.",
+  "contributes": {
+    "languages": [
+      {
+        "id": "flix",
+        "aliases": ["Flix"],
+        "extensions": [".flix"]
+      }
+    ],
+    "grammars": [
+      {
+        "language": "flix",
+        "scopeName": "source.flix",
+        "path": "../syntaxes/flix.tmLanguage.json"
+      }
+    ]
+  }
+}
