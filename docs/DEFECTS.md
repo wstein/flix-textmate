@@ -10,7 +10,8 @@ That grammar is what GitHub Linguist vendors — `.gitmodules` maps
 records it as the sole provider of `source.flix`. So these defects are what renders Flix on
 github.com and in every Shiki-based documentation site.
 
-Each entry names the rule that fixes it once implemented, and each has a regression test.
+Every defect below is addressed in this grammar. The resolution table at the end says how,
+and names the test that would catch a regression.
 
 ## Tokenization
 
@@ -84,3 +85,34 @@ rule matching `@` plus letters covers every annotation that exists or will exist
 
 Defect 11d is prevented structurally here: `ScopeName` in `src/typescript/TmLanguage.ts` is
 `` `${string}.flix` ``, so an unsuffixed scope fails to compile.
+
+## Resolution
+
+| #           | How it is addressed here                                                                                                                | Regression test                                                      |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| 1           | `#number-hex` is included before `#number` in `#literals`                                                                               | `tests/unit/literals.test.flix`                                      |
+| 2           | The dead `\b\(\)\b` rule is not carried over; `()` is scoped as two parens                                                              | `tests/snap/declarations.test.flix`                                  |
+| 3           | One numeric rule with an optional suffix alternation, so no rule shadows another                                                        | `tests/unit/literals.test.flix`                                      |
+| 6           | `#block-comment` includes itself                                                                                                        | `tests/unit/comments.test.flix`                                      |
+| 7           | `#doc-comment` matches exactly three slashes; four or more fall to `#line-comment`                                                      | `tests/unit/comments.test.flix`                                      |
+| 10          | Every `begin` has a line-anchored `end`, enforced by `scripts/lint-grammar.mjs`                                                         | `tests/unit/literals.test.flix`, `scripts/audit-corpus.mjs`          |
+| 12          | Exponents follow the grammar documented on `Lexer.acceptNumber`                                                                         | `tests/unit/literals.test.flix`                                      |
+| 13          | `DIGITS` is `[0-9]+(_[0-9]+)*`                                                                                                          | `scripts/check-unscoped.mjs` (`1__2`)                                |
+| 8           | `regex"…"`, `d"…"`, `%%…%%`, math names, and all three hole forms have rules                                                            | `tests/unit/literals.test.flix`, `tests/unit/declarations.test.flix` |
+| Keywords    | Extracted from `Lexer.Keywords` and mapped with `Record<Keyword, ScopeName>`, so an invented or unclassified keyword is a compile error | `tests/unit/keywords.test.flix`, `scripts/check-unscoped.mjs`        |
+| Annotations | One generic rule over `@` plus ASCII letters, so the name list is test data rather than grammar                                         | `tests/unit/keywords.test.flix`                                      |
+| 11a         | `entity.name.function.flix` and `entity.name.type.flix` are assigned positionally                                                       | `tests/unit/declarations.test.flix`                                  |
+| 11b         | A full `punctuation.*` set                                                                                                              | `tests/unit/declarations.test.flix`                                  |
+| 11c         | `;` is `punctuation.terminator.flix`                                                                                                    | `tests/unit/declarations.test.flix`                                  |
+| 11d         | `ScopeName` is `` `${string}.flix` `` — unsuffixed scopes do not compile                                                                | `npm run typecheck`                                                  |
+| 11e         | Library constructors are not scoped at all; only `Resolver`'s structural types are                                                      | `docs/SCOPES.md` records the reasoning                               |
+
+Two further corrections were found while implementing, both verified against `Parser2`:
+
+- The incumbent scopes `\` as `keyword.arrow.function` / struct-arrow handling only, and has
+  no rule for the type/effect separator. `\` is the effect separator in
+  `Type.typeAndEffect` (`def f(): t \ ef`); Flix lambdas are written `x -> e`, so there is no
+  lambda backslash in the language at all.
+- `!` and `$` belong to both `Lexer.isUserOp` and `Lexer.isNameChar`. The lexer resolves the
+  overlap by position, so `let!` and `def$` are single names while a leading `!` or `$` is an
+  operator. Both this grammar and the incumbent would otherwise split them.
