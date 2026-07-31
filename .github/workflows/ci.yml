@@ -35,5 +35,8 @@ jobs:
       - name: Unit tests
         run: npm run test:unit
 
+      - name: Unscoped-identifier check
+        run: npm run test:unscoped
+
       - name: Snapshot tests
         run: npm run test:snap

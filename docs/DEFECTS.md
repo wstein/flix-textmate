@@ -39,17 +39,22 @@ None of these are scoped at all:
 
 ## Keywords
 
-`Lexer.Keywords` is a 78-entry prefix tree (Lexer.scala:49–137). Against it:
+`Lexer.Keywords` is an 84-entry prefix tree (Lexer.scala:49–137). Counts below are
+mechanical: the incumbent grammar's `keywords` and `constants` sections were diffed against
+the extracted manifest in `src/typescript/lexicon.generated.ts`.
 
 **Declared but nonexistent (7).** Verified absent — `grep -c '("<kw>",' Lexer.scala` returns
 0 for each:
 
 `dbg`, `typematch`, `resume`, `branch`, `jumpto`, `without`, `opaque`
 
-**Present in the lexer but unscoped (11):**
+**Present in the lexer but unscoped (16):**
 
-`Static`, `Univ`, `open_variant`, `open_variant_as`, `restrictable`, `rvadd`, `rvand`,
-`rvnot`, `rvsub`, `super`, `xor`
+`Array#`, `List#`, `Map#`, `Set#`, `Vector#`, `Static`, `Univ`, `open_variant`,
+`open_variant_as`, `restrictable`, `rvadd`, `rvand`, `rvnot`, `rvsub`, `super`, `xor`
+
+The five collection-literal prefixes (`List#{1, 2, 3}`) are keywords in the lexer's table,
+not type names followed by `#`.
 
 ## Annotations
 

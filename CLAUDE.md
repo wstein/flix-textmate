@@ -22,8 +22,11 @@ npm run verify       # typecheck + lint + check:build + test:unit + test:snap
 npm run check:build  # rebuild and fail if the committed JSON changed
 npm run fmt          # prettier --write, then eslint --fix
 npm run test:unit    # inline scope assertions
+npm run test:unscoped # identifiers that must receive no scope at all
 npm run test:snap    # full-tokenization snapshots
 npm run update:snap  # rewrite snapshots (review the diff!)
+
+npm run extract:lexicon -- --flix-source ~/github.com/wstein/flix-fork
 ```
 
 Run `npm run fmt && npm run verify` before every commit.
@@ -58,7 +61,17 @@ keywords that are not in `Lexer.Keywords` (`dbg`, `typematch`, `resume`, `branch
   not a dependency: the types are public schema, and taking a third-party package for the
   _definition_ of our published artifact buys little and risks churn. `ScopeName` is
   `` `${string}.flix` ``, which makes an unsuffixed scope a compile error.
-- `src/typescript/FlixTmLanguage.ts` — the grammar. The only hand-written rule source.
+- `src/typescript/lexicon.generated.ts` — keywords, operators, simple tokens, and
+  annotation names extracted from the compiler by `scripts/extract-lexicon.mjs`. Committed,
+  so CI needs no compiler checkout. Never hand-edit; re-run the extractor.
+- `src/typescript/FlixTmLanguage.ts` — the grammar. The only hand-written rule source. Its
+  `KEYWORD_SCOPES` is typed `Record<Keyword, ScopeName>`, so an unclassified, removed, or
+  invented keyword is a compile error.
+- `scripts/tokenize.mjs` — shared `vscode-textmate` harness; the same engine VS Code uses.
+- `scripts/check-unscoped.mjs` — asserts that non-keywords receive _no_ scope. This exists
+  because `vscode-tmgrammar-test` compares scopes with exact string equality, so a negative
+  assertion of `- keyword` passes against `keyword.control.flix` and proves nothing. Put
+  "this must not be highlighted" cases here, never in a unit fixture.
 - `src/typescript/GenerateTmLanguageFile.ts` — validates against `src/schemas/tmlanguage.json`
   with AJV, then writes the JSON. Exits non-zero on validation failure and writes only after
   validation succeeds, so a failed build leaves the previous artifact intact.

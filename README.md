@@ -51,9 +51,24 @@ npm run lint         # eslint, then the structural grammar lint
 npm run fmt          # prettier --write, then eslint --fix
 npm run check:build  # rebuild and fail if the committed JSON changed
 npm run test:unit    # inline scope assertions, tests/unit/**
+npm run test:unscoped # identifiers that must receive no scope at all
 npm run test:snap    # full-tokenization snapshots, tests/snap/**
 npm run update:snap  # rewrite snapshots (review the diff!)
 ```
+
+Keywords, operators, and annotation names are not written by hand. They are extracted from
+the compiler into `src/typescript/lexicon.generated.ts`, which is committed so CI needs no
+compiler checkout:
+
+```bash
+npm run extract:lexicon -- --flix-source ~/github.com/wstein/flix-fork
+```
+
+The grammar maps that manifest with `Record<Keyword, ScopeName>`, so a keyword added to or
+removed from Flix becomes a **type error** until it is classified. Combined with
+`ScopeName` being `` `${string}.flix` ``, three classes of defect are unrepresentable:
+a keyword that does not exist, a keyword left unscoped, and a scope missing its language
+suffix.
 
 `syntaxes/flix.tmLanguage.json` is generated **and committed**. CI runs `check:build`, so a
 grammar edit that is not rebuilt fails the build rather than shipping stale JSON.

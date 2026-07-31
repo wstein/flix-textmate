@@ -10,6 +10,12 @@
   "patterns": [
     {
       "include": "#comments"
+    },
+    {
+      "include": "#annotations"
+    },
+    {
+      "include": "#keywords"
     }
   ],
   "repository": {
@@ -78,6 +84,75 @@
               "name": "punctuation.definition.comment.flix"
             }
           }
+        }
+      ]
+    },
+    "annotations": {
+      "match": "(@)([A-Za-z]+)",
+      "name": "storage.type.annotation.flix",
+      "captures": {
+        "1": {
+          "name": "punctuation.definition.annotation.flix"
+        }
+      }
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "match": "(?<![A-Za-z0-9_!$])(?:false|true)(?![A-Za-z0-9_!$])",
+          "name": "constant.language.boolean.flix"
+        },
+        {
+          "match": "(?<![A-Za-z0-9_!$])(?:null)(?![A-Za-z0-9_!$])",
+          "name": "constant.language.null.flix"
+        },
+        {
+          "match": "(?<![A-Za-z0-9_!$])(?:else|if)(?![A-Za-z0-9_!$])",
+          "name": "keyword.control.conditional.flix"
+        },
+        {
+          "match": "(?<![A-Za-z0-9_!$])(?:project|inject|pquery|psolve|query|solve|fix)(?![A-Za-z0-9_!$])",
+          "name": "keyword.control.datalog.flix"
+        },
+        {
+          "match": "(?<![A-Za-z0-9_!$])(?:choose\\*|foreach|handler|choose|ematch|region|select|catch|match|spawn|throw|yield|case|forA|forM|par|run|try)(?![A-Za-z0-9_!$])",
+          "name": "keyword.control.flix"
+        },
+        {
+          "match": "(?<![A-Za-z0-9_!$])(?:import|use)(?![A-Za-z0-9_!$])",
+          "name": "keyword.control.import.flix"
+        },
+        {
+          "match": "(?<![A-Za-z0-9_!$])(?:unchecked_cast|checked_ecast|checked_cast|unsafe)(?![A-Za-z0-9_!$])",
+          "name": "keyword.operator.cast.flix"
+        },
+        {
+          "match": "(?<![A-Za-z0-9_!$])(?:and|not|xor|or)(?![A-Za-z0-9_!$])",
+          "name": "keyword.operator.logical.flix"
+        },
+        {
+          "match": "(?<![A-Za-z0-9_!$])(?:Vector#|Array#|List#|Map#|Set#|new)(?![A-Za-z0-9_!$])",
+          "name": "keyword.operator.new.flix"
+        },
+        {
+          "match": "(?<![A-Za-z0-9_!$])(?:open_variant_as|open_variant|instanceof|rvadd|rvand|rvnot|rvsub|as)(?![A-Za-z0-9_!$])",
+          "name": "keyword.operator.word.flix"
+        },
+        {
+          "match": "(?<![A-Za-z0-9_!$])(?:discard|forall|static|force|super|where|from|into|lazy|with|xvar)(?![A-Za-z0-9_!$])",
+          "name": "keyword.other.flix"
+        },
+        {
+          "match": "(?<![A-Za-z0-9_!$])(?:lawful|sealed|mut|pub)(?![A-Za-z0-9_!$])",
+          "name": "storage.modifier.flix"
+        },
+        {
+          "match": "(?<![A-Za-z0-9_!$])(?:restrictable|instance|struct|alias|redef|trait|enum|type|def|eff|law|let|mod)(?![A-Za-z0-9_!$])",
+          "name": "storage.type.flix"
+        },
+        {
+          "match": "(?<![A-Za-z0-9_!$])(?:Static|Univ)(?![A-Za-z0-9_!$])",
+          "name": "support.type.builtin.flix"
         }
       ]
     }

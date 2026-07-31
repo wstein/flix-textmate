@@ -33,11 +33,13 @@
     "lint:grammar": "node scripts/lint-grammar.mjs",
     "fmt": "prettier --write . && eslint --fix .",
     "fmt:check": "prettier --check .",
-    "test": "npm run test:unit",
+    "test": "npm-run-all -c test:unit test:unscoped",
     "test:unit": "vscode-tmgrammar-test -g syntaxes/flix.tmLanguage.json 'tests/unit/**/*.test.flix'",
     "test:snap": "vscode-tmgrammar-snap --config tests/tmgrammar.config.json -g syntaxes/flix.tmLanguage.json 'tests/snap/**/*.test.flix'",
     "update:snap": "vscode-tmgrammar-snap --updateSnapshot --config tests/tmgrammar.config.json -g syntaxes/flix.tmLanguage.json 'tests/snap/**/*.test.flix'",
-    "verify": "npm-run-all -c typecheck lint check:build test:unit test:snap"
+    "verify": "npm-run-all -c typecheck lint check:build test:unit test:unscoped test:snap",
+    "extract:lexicon": "node scripts/extract-lexicon.mjs",
+    "test:unscoped": "node scripts/check-unscoped.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

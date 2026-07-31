@@ -1,0 +1,91 @@
+>    def f(): Int32 = 1
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^^^^^^^^^^^^^^^^ source.flix
+>    pub def g(x: Bool): Bool = if (x) not x else x
+#^^^^ source.flix
+#    ^^^ source.flix storage.modifier.flix
+#       ^ source.flix
+#        ^^^ source.flix storage.type.flix
+#           ^^^^^^^^^^^^^^^^^^^^ source.flix
+#                               ^^ source.flix keyword.control.conditional.flix
+#                                 ^^^^^ source.flix
+#                                      ^^^ source.flix keyword.operator.logical.flix
+#                                         ^^^ source.flix
+#                                            ^^^^ source.flix keyword.control.conditional.flix
+#                                                ^^^ source.flix
+>    let! y = 1
+#^^^^^^^^^^^^^^^ source.flix
+>    forall forA forM foreach
+#^^^^ source.flix
+#    ^^^^^^ source.flix keyword.other.flix
+#          ^ source.flix
+#           ^^^^ source.flix keyword.control.flix
+#               ^ source.flix
+#                ^^^^ source.flix keyword.control.flix
+#                    ^ source.flix
+#                     ^^^^^^^ source.flix keyword.control.flix
+>    instance instanceof
+#^^^^ source.flix
+#    ^^^^^^^^ source.flix storage.type.flix
+#            ^ source.flix
+#             ^^^^^^^^^^ source.flix keyword.operator.word.flix
+>    choose choose*
+#^^^^ source.flix
+#    ^^^^^^ source.flix keyword.control.flix
+#          ^ source.flix
+#           ^^^^^^^ source.flix keyword.control.flix
+>    query solve pquery psolve inject project fix
+#^^^^ source.flix
+#    ^^^^^ source.flix keyword.control.datalog.flix
+#         ^ source.flix
+#          ^^^^^ source.flix keyword.control.datalog.flix
+#               ^ source.flix
+#                ^^^^^^ source.flix keyword.control.datalog.flix
+#                      ^ source.flix
+#                       ^^^^^^ source.flix keyword.control.datalog.flix
+#                             ^ source.flix
+#                              ^^^^^^ source.flix keyword.control.datalog.flix
+#                                    ^ source.flix
+#                                     ^^^^^^^ source.flix keyword.control.datalog.flix
+#                                            ^ source.flix
+#                                             ^^^ source.flix keyword.control.datalog.flix
+>    select where with from into
+#^^^^ source.flix
+#    ^^^^^^ source.flix keyword.control.flix
+#          ^ source.flix
+#           ^^^^^ source.flix keyword.other.flix
+#                ^ source.flix
+#                 ^^^^ source.flix keyword.other.flix
+#                     ^ source.flix
+#                      ^^^^ source.flix keyword.other.flix
+#                          ^ source.flix
+#                           ^^^^ source.flix keyword.other.flix
+>    List#{1, 2, 3}
+#^^^^ source.flix
+#    ^^^^^ source.flix keyword.operator.new.flix
+#         ^^^^^^^^^^ source.flix
+>    @Tailrec
+#^^^^ source.flix
+#    ^ source.flix storage.type.annotation.flix punctuation.definition.annotation.flix
+#     ^^^^^^^ source.flix storage.type.annotation.flix
+>    @Terminates
+#^^^^ source.flix
+#    ^ source.flix storage.type.annotation.flix punctuation.definition.annotation.flix
+#     ^^^^^^^^^^ source.flix storage.type.annotation.flix
+>    @MustUseSomedayInvented
+#^^^^ source.flix
+#    ^ source.flix storage.type.annotation.flix punctuation.definition.annotation.flix
+#     ^^^^^^^^^^^^^^^^^^^^^^ source.flix storage.type.annotation.flix
+>    Static Univ static
+#^^^^ source.flix
+#    ^^^^^^ source.flix support.type.builtin.flix
+#          ^ source.flix
+#           ^^^^ source.flix support.type.builtin.flix
+#               ^ source.flix
+#                ^^^^^^ source.flix keyword.other.flix
+>    let z = 1
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^^^^^^^ source.flix
+>
