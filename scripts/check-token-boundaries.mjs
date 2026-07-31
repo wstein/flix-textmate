@@ -39,8 +39,8 @@
  *
  * ## Running it
  *
- *   npm run check:boundaries -- --tree-sitter ~/github.com/wstein/tree-sitter-flix \
- *                               --corpus ~/github.com/wstein/flix-fork/examples
+ *   npm run check:boundaries -- --tree-sitter <path-to-tree-sitter-flix> \
+ *                               --corpus <path-to-flix-checkout>
  *
  * Needs a tree-sitter-flix checkout whose `src/parser.c` is current, so CI does not run it.
  * It shells out to `tree-sitter parse --xml` rather than loading the native binding: the
@@ -49,12 +49,15 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Buffer } from 'node:buffer';
-import { homedir } from 'node:os';
-
 import { loadGrammar, tokenize } from './tokenize.mjs';
+import {
+  FLIX_COMPILER,
+  TREE_SITTER_FLIX,
+  resolveCheckout,
+} from './external-checkout.mjs';
 
 /**
  * Node kinds whose text is exactly one lexical token.
@@ -75,20 +78,16 @@ const ATOMIC_KINDS = new Set([
   'modifier',
 ]);
 
-function argValue(flag, fallback) {
-  const index = process.argv.indexOf(flag);
-  return index !== -1 && process.argv[index + 1] ? process.argv[index + 1] : fallback;
-}
-
-const treeSitterRoot = argValue(
-  '--tree-sitter',
-  process.env.TREE_SITTER_FLIX ??
-    join(homedir(), 'github.com', 'wstein', 'tree-sitter-flix'),
-);
-const corpusRoot = argValue(
-  '--corpus',
-  process.env.FLIX_SOURCE ?? join(homedir(), 'github.com', 'wstein', 'flix-fork'),
-);
+const treeSitterRoot = resolveCheckout({
+  flag: '--tree-sitter',
+  env: 'TREE_SITTER_FLIX',
+  ...TREE_SITTER_FLIX,
+});
+const corpusRoot = resolveCheckout({
+  flag: '--corpus',
+  env: 'FLIX_SOURCE',
+  ...FLIX_COMPILER,
+});
 
 /** Collects `.flix` files, skipping dot-directories. */
 function collectFlixFiles(dir, found = []) {
@@ -149,11 +148,6 @@ function parseAtomicLeaves(xml) {
   return bySource;
 }
 
-if (!statSync(corpusRoot, { throwIfNoEntry: false })?.isDirectory()) {
-  console.error(`Corpus not found: ${corpusRoot}`);
-  process.exit(2);
-}
-
 const files = collectFlixFiles(corpusRoot);
 if (files.length === 0) {
   console.error(`No .flix files under ${corpusRoot}`);
@@ -162,18 +156,30 @@ if (files.length === 0) {
 
 let xml;
 try {
-  xml = execFileSync('npx', ['tree-sitter', 'parse', '--xml', ...files], {
-    cwd: treeSitterRoot,
-    encoding: 'utf8',
-    maxBuffer: 1024 * 1024 * 512,
-    stdio: ['ignore', 'pipe', 'ignore'],
-  });
+  // `npx` resolves tree-sitter-cli inside the checkout, whose binary is a post-install
+  // download and is often absent; fall back to whatever is on PATH.
+  xml = execFileSync(
+    process.env.TREE_SITTER_CLI ?? 'tree-sitter',
+    ['parse', '--xml', ...files],
+    {
+      cwd: treeSitterRoot,
+      encoding: 'utf8',
+      maxBuffer: 1024 * 1024 * 512,
+      stdio: ['ignore', 'pipe', 'ignore'],
+    },
+  );
 } catch (error) {
   // A non-zero exit means some file failed to parse; the XML on stdout is still usable.
   xml = error.stdout ?? '';
   if (!xml) {
-    console.error(`tree-sitter parse failed in ${treeSitterRoot}`);
-    console.error('Is src/parser.c current? Run `tree-sitter generate` there.');
+    console.error(`Could not run tree-sitter parse in ${treeSitterRoot}\n`);
+    if (error.code === 'ENOENT') {
+      console.error('No `tree-sitter` binary on PATH. Install the CLI, or point');
+      console.error('TREE_SITTER_CLI at one.');
+    } else {
+      console.error('The parser produced no output. Is src/parser.c current?');
+      console.error('Run `tree-sitter generate` in that checkout.');
+    }
     process.exit(2);
   }
 }

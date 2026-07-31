@@ -4,7 +4,7 @@
  * ## Source of truth
  *
  * Nothing here is written from memory. Every token class is derived from the reference
- * compiler in `flix-fork/main/src/ca/uwaterloo/flix/language/`:
+ * compiler, https://github.com/flix/flix, under `main/src/ca/uwaterloo/flix/language/`:
  *
  * | File                 | What it decides                                             |
  * | -------------------- | ----------------------------------------------------------- |

@@ -22,7 +22,8 @@ contributed upstream unchanged.
 ## Source of truth
 
 Nothing in the grammar is written from memory. Every token class is derived from the
-reference compiler:
+reference compiler, [`flix/flix`](https://github.com/flix/flix), under
+`main/src/ca/uwaterloo/flix/language/`:
 
 | File                           | What it decides                                              |
 | ------------------------------ | ------------------------------------------------------------ |
@@ -59,10 +60,17 @@ npm run update:snap  # rewrite snapshots (review the diff!)
 Against a Flix source tree (not vendored, so CI does not run these):
 
 ```bash
-npm run audit -- --corpus ~/github.com/wstein/flix-fork
-npm run check:boundaries -- --corpus ~/github.com/wstein/flix-fork
-npm run docs:mapping -- --tree-sitter ~/github.com/wstein/tree-sitter-flix
+export FLIX_SOURCE=/path/to/flix          # https://github.com/flix/flix
+export TREE_SITTER_FLIX=/path/to/tree-sitter-flix
+
+npm run audit
+npm run check:boundaries
+npm run docs:mapping
 ```
+
+Each also takes an explicit flag (`--corpus`, `--tree-sitter`, `--flix-source`). There is no
+default location: a hardcoded fallback works on one machine and fails confusingly on every
+other.
 
 `check:boundaries` is the only gate with an **independent oracle**. It parses the corpus
 with [`tree-sitter-flix`](https://github.com/wstein/tree-sitter-flix) and asserts that no
@@ -82,8 +90,8 @@ the compiler into `src/typescript/lexicon.generated.ts`, which is committed so C
 compiler checkout:
 
 ```bash
-npm run extract:lexicon -- --flix-source ~/github.com/wstein/flix-fork
-npm run check:lexicon   # fail if the committed manifest differs from a fresh extraction
+npm run extract:lexicon          # reads $FLIX_SOURCE
+npm run check:lexicon            # fail if the committed manifest differs from a fresh run
 ```
 
 `lexicon.generated.ts` is excluded from Prettier. Reformatting a generated file means the

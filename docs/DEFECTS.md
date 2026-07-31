@@ -2,8 +2,9 @@
 
 Findings against
 [`flix/textmate@befa883`](https://github.com/flix/textmate/blob/master/syntaxes/flix.tmLanguage.json)
-(360 lines, last changed 2025-09-10), measured against the reference compiler in
-`flix-fork/main/src/ca/uwaterloo/flix/language/`.
+(360 lines, last changed 2025-09-10), measured against the reference compiler
+[`flix/flix`](https://github.com/flix/flix), under
+`main/src/ca/uwaterloo/flix/language/`.
 
 That grammar is what GitHub Linguist vendors — `.gitmodules` maps
 `vendor/grammars/textmate` to `https://github.com/flix/textmate.git`, and `grammars.yml`

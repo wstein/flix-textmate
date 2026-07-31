@@ -13,25 +13,23 @@
  * scope list nor the capture list is, so an addition on either side shows up as
  * unmapped rather than silently going unnoticed.
  *
- *   npm run docs:mapping -- --tree-sitter ~/github.com/wstein/tree-sitter-flix
+ *   npm run docs:mapping -- --tree-sitter <path-to-tree-sitter-flix>
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { homedir } from 'node:os';
-
 import { GRAMMAR_PATH } from './tokenize.mjs';
+import { TREE_SITTER_FLIX, resolveCheckout } from './external-checkout.mjs';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outputPath = join(repoRoot, 'docs', 'SCOPE-MAPPING.md');
 
-const flagIndex = process.argv.indexOf('--tree-sitter');
-const treeSitterRoot =
-  flagIndex !== -1 && process.argv[flagIndex + 1]
-    ? process.argv[flagIndex + 1]
-    : (process.env.TREE_SITTER_FLIX ??
-      join(homedir(), 'github.com', 'wstein', 'tree-sitter-flix'));
+const treeSitterRoot = resolveCheckout({
+  flag: '--tree-sitter',
+  env: 'TREE_SITTER_FLIX',
+  ...TREE_SITTER_FLIX,
+});
 
 /**
  * Hand-authored correspondence, TextMate scope to tree-sitter capture(s).

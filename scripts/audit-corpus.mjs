@@ -20,24 +20,23 @@
  * CI does not run this: it needs a Flix source tree, which is not vendored here. Run it
  * locally when changing rules, and commit the refreshed baseline with the change.
  *
- *   npm run audit -- --corpus ~/github.com/wstein/flix-fork
+ *   npm run audit -- --corpus <path-to-flix-checkout>
  */
 
-import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { homedir } from 'node:os';
-
 import { loadGrammar, tokenize, finalRuleStack } from './tokenize.mjs';
+import { FLIX_COMPILER, resolveCheckout } from './external-checkout.mjs';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const baselinePath = join(repoRoot, 'tests', 'corpus-baseline.json');
 
-const flagIndex = process.argv.indexOf('--corpus');
-const corpusRoot =
-  flagIndex !== -1 && process.argv[flagIndex + 1]
-    ? process.argv[flagIndex + 1]
-    : (process.env.FLIX_SOURCE ?? join(homedir(), 'github.com', 'wstein', 'flix-fork'));
+const corpusRoot = resolveCheckout({
+  flag: '--corpus',
+  env: 'FLIX_SOURCE',
+  ...FLIX_COMPILER,
+});
 
 const shouldUpdate = process.argv.includes('--update-baseline');
 
@@ -50,12 +49,6 @@ function collectFlixFiles(dir, found = []) {
     else if (entry.name.endsWith('.flix')) found.push(path);
   }
   return found;
-}
-
-if (!statSync(corpusRoot, { throwIfNoEntry: false })?.isDirectory()) {
-  console.error(`Corpus not found: ${corpusRoot}`);
-  console.error('Pass --corpus <path> or set FLIX_SOURCE.');
-  process.exit(2);
 }
 
 const files = collectFlixFiles(corpusRoot);

@@ -26,9 +26,12 @@ npm run test:unscoped # identifiers that must receive no scope at all
 npm run test:snap    # full-tokenization snapshots
 npm run update:snap  # rewrite snapshots (review the diff!)
 
-npm run extract:lexicon -- --flix-source ~/github.com/wstein/flix-fork
-npm run audit -- --corpus ~/github.com/wstein/flix-fork
-npm run docs:mapping -- --tree-sitter ~/github.com/wstein/tree-sitter-flix
+# These read $FLIX_SOURCE / $TREE_SITTER_FLIX, or take --flix-source / --corpus /
+# --tree-sitter. There is no default path; see scripts/external-checkout.mjs.
+npm run extract:lexicon
+npm run audit
+npm run check:boundaries
+npm run docs:mapping
 ```
 
 The last three need a local Flix or tree-sitter-flix checkout, so CI does not run them. Run
@@ -42,8 +45,9 @@ JSON.
 
 ## Source of truth
 
-Do not write Flix lexical rules from memory. The reference compiler at
-`~/github.com/wstein/flix-fork/main/src/ca/uwaterloo/flix/language/` is authoritative:
+Do not write Flix lexical rules from memory. The reference compiler,
+[`flix/flix`](https://github.com/flix/flix), is authoritative — the files below are under
+`main/src/ca/uwaterloo/flix/language/`:
 
 | File                  | What to take from it                                         |
 | --------------------- | ------------------------------------------------------------ |
@@ -118,7 +122,8 @@ keywords that are not in `Lexer.Keywords` (`dbg`, `typematch`, `resume`, `branch
 
 ### Relationship to tree-sitter-flix
 
-`~/github.com/wstein/tree-sitter-flix` is a sibling project with the same source of truth
+[`wstein/tree-sitter-flix`](https://github.com/wstein/tree-sitter-flix) is a sibling project
+with the same source of truth
 and a `queries/highlights.scm`. Do **not** copy that file here — it is coupled to node names
 in that repository's `grammar.js` and cannot be validated without its parser. The shared
 artifact is the lexicon manifest extracted from `Lexer.scala`; the scope correspondence is
