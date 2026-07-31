@@ -39,7 +39,9 @@
     "update:snap": "vscode-tmgrammar-snap --updateSnapshot --config tests/tmgrammar.config.json -g syntaxes/flix.tmLanguage.json 'tests/snap/**/*.test.flix'",
     "verify": "npm-run-all -c typecheck lint check:build test:unit test:unscoped test:snap",
     "extract:lexicon": "node scripts/extract-lexicon.mjs",
-    "test:unscoped": "node scripts/check-unscoped.mjs"
+    "test:unscoped": "node scripts/check-unscoped.mjs",
+    "audit": "node scripts/audit-corpus.mjs",
+    "docs:mapping": "node scripts/generate-scope-mapping.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

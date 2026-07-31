@@ -56,6 +56,19 @@ npm run test:snap    # full-tokenization snapshots, tests/snap/**
 npm run update:snap  # rewrite snapshots (review the diff!)
 ```
 
+Against a Flix source tree (not vendored, so CI does not run these):
+
+```bash
+npm run audit -- --corpus ~/github.com/wstein/flix-fork
+npm run docs:mapping -- --tree-sitter ~/github.com/wstein/tree-sitter-flix
+```
+
+`audit` enforces two things: no file may end with a rule still open (a hard gate — currently
+zero across 890 files), and scope coverage may not fall below `tests/corpus-baseline.json`.
+Coverage is a **ratchet, not a target**: this grammar deliberately leaves expression-position
+identifiers bare, so chasing the number would mean inventing the heuristics it refuses to
+ship.
+
 Keywords, operators, and annotation names are not written by hand. They are extracted from
 the compiler into `src/typescript/lexicon.generated.ts`, which is committed so CI needs no
 compiler checkout:
@@ -86,6 +99,12 @@ Two complementary suites:
 
 Fixture lines are indented by four spaces so an assertion line's own `//` prefix does not
 overlap the columns it points at.
+
+## Documentation
+
+- [`docs/SCOPES.md`](docs/SCOPES.md) — every scope, and why it is what it is.
+- [`docs/SCOPE-MAPPING.md`](docs/SCOPE-MAPPING.md) — correspondence with `tree-sitter-flix`.
+- [`docs/DEFECTS.md`](docs/DEFECTS.md) — what is wrong with the grammar this replaces.
 
 ## Licence
 

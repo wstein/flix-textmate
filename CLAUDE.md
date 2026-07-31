@@ -27,7 +27,12 @@ npm run test:snap    # full-tokenization snapshots
 npm run update:snap  # rewrite snapshots (review the diff!)
 
 npm run extract:lexicon -- --flix-source ~/github.com/wstein/flix-fork
+npm run audit -- --corpus ~/github.com/wstein/flix-fork
+npm run docs:mapping -- --tree-sitter ~/github.com/wstein/tree-sitter-flix
 ```
+
+The last three need a local Flix or tree-sitter-flix checkout, so CI does not run them. Run
+`audit` after any rule change and commit the refreshed `tests/corpus-baseline.json` with it.
 
 Run `npm run fmt && npm run verify` before every commit.
 
@@ -76,6 +81,12 @@ keywords that are not in `Lexer.Keywords` (`dbg`, `typematch`, `resume`, `branch
   with AJV, then writes the JSON. Exits non-zero on validation failure and writes only after
   validation succeeds, so a failed build leaves the previous artifact intact.
 - `scripts/lint-grammar.mjs` — structural lint over the emitted JSON.
+- `scripts/audit-corpus.mjs` — tokenizes a Flix source tree. Hard gate: no file may end with
+  a rule still open. Ratchet: coverage may not fall below `tests/corpus-baseline.json`.
+  Coverage is **not** a target — raising it by guessing at expression-position identifiers is
+  precisely what this grammar refuses to do.
+- `scripts/generate-scope-mapping.mjs` — emits `docs/SCOPE-MAPPING.md`. Both inventories are
+  read mechanically, so a scope or capture added on either side surfaces as unmapped.
 
 ### Grammar conventions
 
@@ -102,7 +113,9 @@ keywords that are not in `Lexer.Keywords` (`dbg`, `typematch`, `resume`, `branch
 `~/github.com/wstein/tree-sitter-flix` is a sibling project with the same source of truth
 and a `queries/highlights.scm`. Do **not** copy that file here — it is coupled to node names
 in that repository's `grammar.js` and cannot be validated without its parser. The shared
-artifact is the lexicon manifest extracted from `Lexer.scala`.
+artifact is the lexicon manifest extracted from `Lexer.scala`; the scope correspondence is
+documented in `docs/SCOPE-MAPPING.md`, which reports both inventories mechanically so drift
+is visible.
 
 Some things tree-sitter handles with an external C scanner are simply not expressible here:
 the `.` trichotomy (qualified-name separator vs. Datalog constraint terminator) needs to
@@ -117,3 +130,5 @@ Nested block comments and interpolated strings _are_ expressible — via self-in
 - Fixture lines in `tests/` are indented four spaces so assertion `//` prefixes do not
   overlap the columns they point at.
 - Every defect fixed gets a unit test that fails before the fix.
+- Scope names are a contract. Adding one is easy; removing one breaks every theme that keys
+  on it. Document each in `docs/SCOPES.md` at the same time.
