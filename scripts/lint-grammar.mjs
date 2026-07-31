@@ -33,12 +33,33 @@ const ALLOWED_MULTILINE = new Map([
   ],
 ]);
 
-/** Patterns that let an `end` match at end-of-line. */
-const LINE_ANCHORS = ['$', '\\n', '(?=\\n)', '(?!\\G)'];
+/**
+ * Returns true if `pattern` can match at end-of-line.
+ *
+ * A substring search for `$` is not good enough: an `end` of `\$\}`, `[$]`, or `\$` would
+ * satisfy it while being anchored to a *literal* dollar sign that may never appear. That
+ * matters here — the grammar already handles `${` interpolation, so escaped dollars in an
+ * `end` pattern are a realistic near-miss. This scans character by character, tracking
+ * escapes and character classes, and counts only a `$` that is genuinely the anchor
+ * metacharacter.
+ */
+function isLineAnchored(pattern) {
+  if (pattern.includes('\\n') || pattern.includes('(?!\\G)')) return true;
 
-/** Returns true if `end` can match at end-of-line. */
-function isLineAnchored(end) {
-  return LINE_ANCHORS.some((anchor) => end.includes(anchor));
+  let inClass = false;
+  for (let i = 0; i < pattern.length; i += 1) {
+    const char = pattern[i];
+    if (char === '\\') {
+      i += 1; // Skip the escaped character.
+    } else if (inClass) {
+      if (char === ']') inClass = false;
+    } else if (char === '[') {
+      inClass = true;
+    } else if (char === '$') {
+      return true;
+    }
+  }
+  return false;
 }
 
 const grammar = JSON.parse(readFileSync(grammarPath, 'utf8'));
@@ -52,27 +73,38 @@ function walk(node, path) {
   }
   if (node === null || typeof node !== 'object') return;
 
-  if (typeof node.begin === 'string' && typeof node.end === 'string') {
-    if (!isLineAnchored(node.end) && !ALLOWED_MULTILINE.has(path)) {
+  // `while` has the same runaway failure mode as `end`: a rule whose `while` always
+  // matches never terminates. Checking only `begin`+`end` exempted it by construction.
+  if (typeof node.begin === 'string') {
+    const terminator =
+      typeof node.end === 'string'
+        ? { key: 'end', pattern: node.end }
+        : typeof node.while === 'string'
+          ? { key: 'while', pattern: node.while }
+          : null;
+
+    if (terminator === null) {
+      problems.push(`${path}: begin rule has neither an 'end' nor a 'while' pattern.`);
+    } else if (!isLineAnchored(terminator.pattern) && !ALLOWED_MULTILINE.has(path)) {
       problems.push(
-        `${path}: end pattern ${JSON.stringify(node.end)} cannot match at end-of-line. ` +
-          'Add a line anchor, or add the rule to ALLOWED_MULTILINE with a reason.',
+        `${path}: ${terminator.key} pattern ${JSON.stringify(terminator.pattern)} ` +
+          'cannot match at end-of-line. Add a line anchor, or add the rule to ' +
+          'ALLOWED_MULTILINE with a reason.',
       );
     }
   }
 
+  // Generic recursion. An earlier version dispatched on a fixed set of key names, which
+  // silently skipped rules nested under a capture group: the keys of a `captures` object
+  // are "0", "1", "2" …, none of which matched any branch, so a begin/end rule placed in
+  // a capture's `patterns` escaped the check entirely.
   for (const [key, value] of Object.entries(node)) {
+    if (value === null || typeof value !== 'object') continue;
     if (key === 'repository' || key === 'injections') {
       for (const [name, rule] of Object.entries(value)) {
         walk(rule, path ? `${path}.${key}.${name}` : `${key}.${name}`);
       }
-    } else if (key === 'patterns' || key === 'captures') {
-      walk(value, path ? `${path}.${key}` : key);
-    } else if (
-      key === 'beginCaptures' ||
-      key === 'endCaptures' ||
-      key === 'whileCaptures'
-    ) {
+    } else {
       walk(value, path ? `${path}.${key}` : key);
     }
   }

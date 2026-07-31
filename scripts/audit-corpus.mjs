@@ -101,6 +101,20 @@ console.log(`Scopes:   ${scopeChars.size} distinct`);
 
 const baseline = shouldUpdate ? null : JSON.parse(readFileSync(baselinePath, 'utf8'));
 
+// The end-of-file gate runs before the update branch, not after it. Refreshing the
+// baseline is the documented workflow after any rule change, so exiting first would make
+// the one path developers actually take the one path that skips the hard gate — and CI
+// does not run this script, so nothing else would catch it.
+if (unclosed.length > 0) {
+  console.error(`\n${unclosed.length} file(s) end with a rule still open:\n`);
+  for (const file of unclosed.slice(0, 10)) console.error(`    ${file}`);
+  if (unclosed.length > 10) console.error(`    … and ${unclosed.length - 10} more`);
+  console.error(
+    '\nThis is a hard gate: a begin whose end never fires paints the rest of the file.',
+  );
+  process.exit(1);
+}
+
 if (shouldUpdate) {
   writeFileSync(
     baselinePath,
@@ -125,13 +139,14 @@ if (shouldUpdate) {
 
 const problems = [];
 
-if (unclosed.length > 0) {
+// A coverage ratchet means nothing unless it is measured over the same corpus. `--corpus`
+// and `$FLIX_SOURCE` both accept any directory containing at least one `.flix` file, so
+// pointing at a subtree would otherwise produce a green result from a handful of files.
+if (files.length !== baseline.corpusFiles) {
   problems.push(
-    `${unclosed.length} file(s) end with a rule still open:\n` +
-      unclosed
-        .slice(0, 10)
-        .map((file) => `    ${file}`)
-        .join('\n'),
+    `Corpus has ${files.length} files but the baseline was measured over ` +
+      `${baseline.corpusFiles}. The ratchet only compares like with like — point --corpus ` +
+      'at the same tree, or re-run with --update-baseline if the corpus itself changed.',
   );
 }
 
