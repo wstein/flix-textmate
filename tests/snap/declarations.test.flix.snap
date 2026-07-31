@@ -1,0 +1,192 @@
+>    pub def add(x: Int32, y: Int32): Int32 = x + y
+#^^^^ source.flix
+#    ^^^ source.flix storage.modifier.flix
+#       ^ source.flix
+#        ^^^ source.flix storage.type.flix
+#           ^ source.flix
+#            ^^^ source.flix entity.name.function.flix
+#               ^ source.flix punctuation.section.parens.flix
+#                ^ source.flix
+#                 ^ source.flix punctuation.separator.colon.flix
+#                  ^ source.flix
+#                   ^^^^^ source.flix support.type.primitive.flix
+#                        ^ source.flix punctuation.separator.comma.flix
+#                         ^^ source.flix
+#                           ^ source.flix punctuation.separator.colon.flix
+#                            ^ source.flix
+#                             ^^^^^ source.flix support.type.primitive.flix
+#                                  ^ source.flix punctuation.section.parens.flix
+#                                   ^ source.flix punctuation.separator.colon.flix
+#                                    ^ source.flix
+#                                     ^^^^^ source.flix support.type.primitive.flix
+#                                          ^ source.flix
+#                                           ^ source.flix keyword.operator.flix
+#                                            ^^^ source.flix
+#                                               ^ source.flix keyword.operator.flix
+#                                                ^^^ source.flix
+>    def >>(f: a -> b, g: b -> c): a -> c = z -> g(f(z))
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^ source.flix
+#        ^^ source.flix entity.name.function.flix
+#          ^ source.flix punctuation.section.parens.flix
+#           ^ source.flix
+#            ^ source.flix punctuation.separator.colon.flix
+#             ^^^ source.flix
+#                ^^ source.flix keyword.operator.arrow.flix
+#                  ^^ source.flix
+#                    ^ source.flix punctuation.separator.comma.flix
+#                     ^^ source.flix
+#                       ^ source.flix punctuation.separator.colon.flix
+#                        ^^^ source.flix
+#                           ^^ source.flix keyword.operator.arrow.flix
+#                             ^^ source.flix
+#                               ^ source.flix punctuation.section.parens.flix
+#                                ^ source.flix punctuation.separator.colon.flix
+#                                 ^^^ source.flix
+#                                    ^^ source.flix keyword.operator.arrow.flix
+#                                      ^^^ source.flix
+#                                         ^ source.flix keyword.operator.flix
+#                                          ^^^ source.flix
+#                                             ^^ source.flix keyword.operator.arrow.flix
+#                                               ^^ source.flix
+#                                                 ^ source.flix punctuation.section.parens.flix
+#                                                  ^ source.flix
+#                                                   ^ source.flix punctuation.section.parens.flix
+#                                                    ^ source.flix
+#                                                     ^ source.flix punctuation.section.parens.flix
+#                                                      ^ source.flix punctuation.section.parens.flix
+>    law reflexivity: forall (x: a) . x == x
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^ source.flix
+#        ^^^^^^^^^^^ source.flix entity.name.function.flix
+#                   ^ source.flix punctuation.separator.colon.flix
+#                    ^ source.flix
+#                     ^^^^^^ source.flix keyword.other.flix
+#                           ^ source.flix
+#                            ^ source.flix punctuation.section.parens.flix
+#                             ^ source.flix
+#                              ^ source.flix punctuation.separator.colon.flix
+#                               ^^ source.flix
+#                                 ^ source.flix punctuation.section.parens.flix
+#                                  ^ source.flix
+#                                   ^ source.flix punctuation.accessor.flix
+#                                    ^^^ source.flix
+#                                       ^^ source.flix keyword.operator.flix
+#                                         ^^^ source.flix
+>    enum Shape { case Circle(Int32) }
+#^^^^ source.flix
+#    ^^^^ source.flix storage.type.flix
+#        ^ source.flix
+#         ^^^^^ source.flix entity.name.type.flix
+#              ^ source.flix
+#               ^ source.flix punctuation.section.braces.flix
+#                ^ source.flix
+#                 ^^^^ source.flix keyword.control.flix
+#                     ^^^^^^^ source.flix
+#                            ^ source.flix punctuation.section.parens.flix
+#                             ^^^^^ source.flix support.type.primitive.flix
+#                                  ^ source.flix punctuation.section.parens.flix
+#                                   ^ source.flix
+#                                    ^ source.flix punctuation.section.braces.flix
+>    struct Node[r] { value: Int32 }
+#^^^^ source.flix
+#    ^^^^^^ source.flix storage.type.flix
+#          ^ source.flix
+#           ^^^^ source.flix entity.name.type.flix
+#               ^ source.flix punctuation.section.brackets.flix
+#                ^ source.flix
+#                 ^ source.flix punctuation.section.brackets.flix
+#                  ^ source.flix
+#                   ^ source.flix punctuation.section.braces.flix
+#                    ^^^^^^ source.flix
+#                          ^ source.flix punctuation.separator.colon.flix
+#                           ^ source.flix
+#                            ^^^^^ source.flix support.type.primitive.flix
+#                                 ^ source.flix
+#                                  ^ source.flix punctuation.section.braces.flix
+>    trait Eq[a]
+#^^^^ source.flix
+#    ^^^^^ source.flix storage.type.flix
+#         ^ source.flix
+#          ^^ source.flix entity.name.type.flix
+#            ^ source.flix punctuation.section.brackets.flix
+#             ^ source.flix
+#              ^ source.flix punctuation.section.brackets.flix
+>    eff Console
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^ source.flix
+#        ^^^^^^^ source.flix entity.name.type.flix
+>    instance Eq[Shape]
+#^^^^ source.flix
+#    ^^^^^^^^ source.flix storage.type.flix
+#            ^ source.flix
+#             ^^ source.flix entity.name.type.flix
+#               ^ source.flix punctuation.section.brackets.flix
+#                ^^^^^ source.flix
+#                     ^ source.flix punctuation.section.brackets.flix
+>    mod Foo.Bar.Baz
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^ source.flix
+#        ^^^^^^^^^^^ source.flix entity.name.namespace.flix
+>    type alias Grid = Vector[Vector[Int32]]
+#^^^^ source.flix
+#    ^^^^ source.flix storage.type.flix
+#        ^ source.flix
+#         ^^^^^ source.flix storage.type.flix
+#              ^ source.flix
+#               ^^^^ source.flix entity.name.type.flix
+#                   ^ source.flix
+#                    ^ source.flix keyword.operator.flix
+#                     ^ source.flix
+#                      ^^^^^^ source.flix support.type.primitive.flix
+#                            ^ source.flix punctuation.section.brackets.flix
+#                             ^^^^^^ source.flix support.type.primitive.flix
+#                                   ^ source.flix punctuation.section.brackets.flix
+#                                    ^^^^^ source.flix support.type.primitive.flix
+#                                         ^ source.flix punctuation.section.brackets.flix
+#                                          ^ source.flix punctuation.section.brackets.flix
+>    let p = person->name
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^^^ source.flix
+#          ^ source.flix keyword.operator.flix
+#           ^^^^^^^ source.flix
+#                  ^^ source.flix keyword.operator.accessor.flix
+#                    ^^^^^ source.flix
+>    let q = person -> name
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^^^ source.flix
+#          ^ source.flix keyword.operator.flix
+#           ^^^^^^^^ source.flix
+#                   ^^ source.flix keyword.operator.arrow.flix
+#                     ^^^^^^ source.flix
+>    let _ = ∀x
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^ source.flix
+#        ^ source.flix variable.language.wildcard.flix
+#         ^ source.flix
+#          ^ source.flix keyword.operator.flix
+#           ^ source.flix
+#            ^ source.flix variable.other.math.flix
+#             ^^ source.flix
+>    let $use = 1
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^ source.flix
+#        ^ source.flix variable.other.escaped.flix punctuation.definition.variable.flix
+#         ^^^ source.flix variable.other.escaped.flix
+#            ^ source.flix
+#             ^ source.flix keyword.operator.flix
+#              ^ source.flix
+#               ^ source.flix constant.numeric.flix
+>    r.field
+#^^^^^ source.flix
+#     ^ source.flix punctuation.accessor.flix
+#      ^^^^^^ source.flix
+>

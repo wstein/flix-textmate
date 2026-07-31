@@ -26,7 +26,7 @@
  */
 
 import type { Rule, ScopeName, TmLanguage } from './TmLanguage.ts';
-import { KEYWORDS, type Keyword } from './lexicon.generated.ts';
+import { KEYWORDS, PRIMITIVE_TYPES, type Keyword } from './lexicon.generated.ts';
 
 /**
  * Characters that may appear inside a name, from `Lexer.isNameChar`:
@@ -462,6 +462,210 @@ const comments: Record<string, Rule> = {
   },
 };
 
+/**
+ * Name shapes, from `Lexer`.
+ *
+ * `isFirstNameChar` is `isLetter`, which is ASCII-only, and `isNameChar` additionally
+ * admits digits, `_`, `!`, and `$`. Case is not cosmetic in Flix: `Parser2`'s `NAME_TYPE`,
+ * `NAME_VARIABLE`, and `NAME_DEFINITION` sets distinguish `NameUppercase` from
+ * `NameLowercase`, so an uppercase name in type position really is a type.
+ */
+const UPPER_NAME = `[A-Z]${NAME_CHAR}*`;
+const LOWER_NAME = `[a-z_]${NAME_CHAR}*`;
+
+/**
+ * A math identifier, from `Lexer.isMathNameChar`: U+2200–U+22FF, the Unicode
+ * Mathematical Operators block. `∀`, `⊑`, and friends are ordinary identifiers in Flix.
+ */
+const MATH_NAME = '[\\x{2200}-\\x{22FF}]+';
+
+/**
+ * A user-defined operator, from `Lexer.isUserOp`: `+ - * < > = ! & | ^ $`.
+ *
+ * Note the absence of `/`, which lexes as `TokenKind.Slash` so that `//` can start a
+ * comment. Flix lets a definition be *named* by an operator (`def >>`), so this appears in
+ * declaration positions as well as expression ones.
+ */
+const USER_OP = '[+\\-*<>=!&|^$]+';
+
+/**
+ * A user-defined operator in operator *position*.
+ *
+ * `!` and `$` belong to both `Lexer.isUserOp` and `Lexer.isNameChar`. The lexer resolves
+ * the overlap positionally: `acceptName` runs `advanceWhile(isNameChar)`, so `let!` and
+ * `def$` are each a single name, while a leading `!` or `$` is `TokenKind.Bang` or
+ * `TokenKind.Dollar`. So an operator run may begin with `!` or `$` only when it does not
+ * continue a name; the other operator characters are unambiguous.
+ */
+const USER_OP_START = `(?:(?<!${NAME_CHAR})[+\\-*<>=!&|^$]|[+\\-*<>=&|^])[+\\-*<>=!&|^$]*`;
+
+/** Any name that may follow `def`, including operator and math spellings. */
+const DEFINITION_NAME = `(?:${LOWER_NAME}|${UPPER_NAME}|${MATH_NAME}|${USER_OP})`;
+
+/**
+ * Declaration rules.
+ *
+ * These are positional, not heuristic: the scope of the name is fixed by the keyword that
+ * introduces it, which is exactly the distinction `Parser2` makes. Nothing here guesses at
+ * expression-position identifiers — TextMate cannot tell a call from a constructor from a
+ * variable, and getting that wrong is worse than leaving it to the LSP's semantic tokens.
+ *
+ * Every rule must be listed before `#keywords`, since both match at the introducing
+ * keyword and TextMate breaks the tie by array order.
+ */
+const declarations: Record<string, Rule> = {
+  declarations: {
+    patterns: [
+      { include: '#declaration-type-alias' },
+      { include: '#declaration-module' },
+      { include: '#declaration-function' },
+      { include: '#declaration-type' },
+    ],
+  },
+
+  'declaration-function': {
+    comment: 'A definition may be named by a user-defined operator, e.g. `def >>`.',
+    match:
+      `(?<!${NAME_CHAR})(def|redef|law)(?!${NAME_CHAR})` + `\\s+(${DEFINITION_NAME})`,
+    captures: {
+      '1': { name: 'storage.type.flix' },
+      '2': { name: 'entity.name.function.flix' },
+    },
+  },
+
+  'declaration-type': {
+    match:
+      `(?<!${NAME_CHAR})(enum|struct|trait|eff|instance|restrictable)(?!${NAME_CHAR})` +
+      `\\s+(${UPPER_NAME})`,
+    captures: {
+      '1': { name: 'storage.type.flix' },
+      '2': { name: 'entity.name.type.flix' },
+    },
+  },
+
+  'declaration-type-alias': {
+    comment: 'Listed before #declaration-type so `type alias Foo` is not read as `type`.',
+    match: `(?<!${NAME_CHAR})(type)\\s+(alias)(?!${NAME_CHAR})\\s+(${UPPER_NAME})`,
+    captures: {
+      '1': { name: 'storage.type.flix' },
+      '2': { name: 'storage.type.flix' },
+      '3': { name: 'entity.name.type.flix' },
+    },
+  },
+
+  'declaration-module': {
+    match: `(?<!${NAME_CHAR})(mod)(?!${NAME_CHAR})\\s+(${UPPER_NAME}(?:\\.${UPPER_NAME})*)`,
+    captures: {
+      '1': { name: 'storage.type.flix' },
+      '2': { name: 'entity.name.namespace.flix' },
+    },
+  },
+};
+
+/** Name and type rules that hold regardless of surrounding context. */
+const names: Record<string, Rule> = {
+  names: {
+    patterns: [
+      { include: '#primitive-type' },
+      { include: '#math-name' },
+      { include: '#escaped-name' },
+      { include: '#wildcard' },
+    ],
+  },
+
+  'primitive-type': {
+    comment:
+      'The `// Basic Types` table in Resolver.visitType: resolved structurally, before ' +
+      'any name lookup, so unlike `Some` or `Nil` these cannot be shadowed by a user ' +
+      'declaration. Scoping library constructors as language constants is defect #11e.',
+    match: `(?<!${NAME_CHAR})(?:${[...PRIMITIVE_TYPES]
+      .sort((a, b) => b.length - a.length || a.localeCompare(b))
+      .join('|')})(?!${NAME_CHAR})`,
+    name: 'support.type.primitive.flix',
+  },
+
+  'math-name': {
+    match: MATH_NAME,
+    name: 'variable.other.math.flix',
+  },
+
+  'escaped-name': {
+    comment: '`$name` escapes a name that would otherwise be a keyword; Lexer line 324.',
+    match: `(\\$)(${LOWER_NAME}|${UPPER_NAME})`,
+    name: 'variable.other.escaped.flix',
+    captures: { '1': { name: 'punctuation.definition.variable.flix' } },
+  },
+
+  wildcard: {
+    comment:
+      'TokenKind.Underscore. The leading guard matters as much as the trailing one: ' +
+      '`_` is a name character, so the underscore in `case_` continues that name rather ' +
+      'than starting a wildcard.',
+    match: `(?<!${NAME_CHAR})_(?![A-Za-z0-9_!$+\\-*<>=&|^\\x{2200}-\\x{22FF}])`,
+    name: 'variable.language.wildcard.flix',
+  },
+};
+
+/**
+ * Operator and punctuation rules.
+ *
+ * The `->` split is whitespace-sensitive and comes straight from `Lexer.scanToken`:
+ * `a->b` is `ArrowThinRTight` (struct field access) while `a -> b`, `a ->b`, and `a-> b`
+ * are all `ArrowThinRWhitespace` (the function arrow). Only the *tight* form is field
+ * access, so the lookaround below tests for whitespace on either side.
+ */
+const operators: Record<string, Rule> = {
+  operators: {
+    patterns: [
+      { include: '#arrow-function' },
+      { include: '#arrow-struct' },
+      { include: '#operator' },
+      { include: '#punctuation' },
+    ],
+  },
+
+  'arrow-function': {
+    comment:
+      'Whitespace on either side makes this the function arrow, per Lexer.scanToken.',
+    match: '(?<=\\s)->|->(?=\\s)',
+    name: 'keyword.operator.arrow.flix',
+  },
+
+  'arrow-struct': {
+    comment: 'No surrounding whitespace: struct field access, TokenKind.ArrowThinRTight.',
+    match: '->',
+    name: 'keyword.operator.accessor.flix',
+  },
+
+  operator: {
+    comment:
+      'Flix admits user-defined operators, so this is a character class rather than an ' +
+      'enumeration of Lexer.Operators. The named entries are a subset of what this matches.',
+    match: USER_OP_START,
+    name: 'keyword.operator.flix',
+  },
+
+  punctuation: {
+    patterns: [
+      { match: '[{}]', name: 'punctuation.section.braces.flix' },
+      { match: '[()]', name: 'punctuation.section.parens.flix' },
+      { match: '\\[|\\]', name: 'punctuation.section.brackets.flix' },
+      {
+        comment: 'Defect #11c: the incumbent scopes `;` as keyword.control.',
+        match: ';',
+        name: 'punctuation.terminator.flix',
+      },
+      { match: ',', name: 'punctuation.separator.comma.flix' },
+      { match: ':::|::|:-|:', name: 'punctuation.separator.colon.flix' },
+      { match: '\\.', name: 'punctuation.accessor.flix' },
+      { match: '\\\\', name: 'punctuation.definition.lambda.flix' },
+      { match: '`', name: 'punctuation.definition.infix.flix' },
+      { match: '~', name: 'keyword.operator.flix' },
+      { match: '@', name: 'punctuation.definition.annotation.flix' },
+    ],
+  },
+};
+
 export const flixTmLanguage: TmLanguage = {
   $schema:
     'https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json',
@@ -476,12 +680,20 @@ export const flixTmLanguage: TmLanguage = {
     { include: '#comments' },
     { include: '#literals' },
     { include: '#annotations' },
+    // Declarations before keywords: both match at the introducing keyword, and the tie
+    // is broken by array order.
+    { include: '#declarations' },
     { include: '#keywords' },
+    { include: '#names' },
+    { include: '#operators' },
   ],
   repository: {
     ...comments,
     ...literals,
     ...annotations,
+    ...declarations,
     ...keywords,
+    ...names,
+    ...operators,
   },
 };

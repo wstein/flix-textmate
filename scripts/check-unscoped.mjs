@@ -18,7 +18,14 @@
 
 import { loadGrammar, tokenize } from './tokenize.mjs';
 
-/** Identifiers that must tokenize as ordinary names. */
+/**
+ * Each subject declares the substring that must carry no scope.
+ *
+ * The claim is about the name or number, not about neighbouring punctuation: in `let!`
+ * the `!` is legitimately `keyword.operator.flix` when it stands alone, and what matters
+ * is that `let` is not a keyword there. Asserting over the whole subject would conflate
+ * the two and make the check fail for the wrong reason.
+ */
 const MUST_BE_UNSCOPED = [
   // Phantom keywords carried by the incumbent grammar.
   { text: 'dbg', why: 'not in Lexer.Keywords' },
@@ -42,15 +49,28 @@ const MUST_BE_UNSCOPED = [
   { text: '32q', why: 'an invalid suffix is part of the same number token' },
   { text: '1__2', why: 'the digit separator is `[0-9]+(_[0-9]+)*`, not `(_*[0-9])*`' },
   { text: '0xZZ', why: 'no hex digits follow `0x`' },
-  { text: '1.0.5', why: 'a second `.` continues the same erroneous number token' },
+  {
+    text: '1.0.5',
+    subject: '1',
+    why: 'a second `.` continues the same erroneous number token',
+  },
 ];
 
 const grammar = await loadGrammar();
 const problems = [];
 
-for (const { text, why } of MUST_BE_UNSCOPED) {
-  const tokens = [...tokenize(grammar, text)].filter((token) => token.text.trim() !== '');
-  for (const token of tokens) {
+for (const { text, subject = text, why } of MUST_BE_UNSCOPED) {
+  const start = text.indexOf(subject);
+  if (start === -1) {
+    throw new Error(
+      `Subject ${JSON.stringify(subject)} not found in ${JSON.stringify(text)}`,
+    );
+  }
+  const end = start + subject.length;
+
+  for (const token of tokenize(grammar, text)) {
+    // Only tokens overlapping the declared subject are in scope for the claim.
+    if (token.endIndex <= start || token.startIndex >= end) continue;
     const extra = token.scopes.filter((scope) => scope !== 'source.flix');
     if (extra.length > 0) {
       problems.push(

@@ -18,7 +18,16 @@
       "include": "#annotations"
     },
     {
+      "include": "#declarations"
+    },
+    {
       "include": "#keywords"
+    },
+    {
+      "include": "#names"
+    },
+    {
+      "include": "#operators"
     }
   ],
   "repository": {
@@ -310,6 +319,71 @@
         }
       }
     },
+    "declarations": {
+      "patterns": [
+        {
+          "include": "#declaration-type-alias"
+        },
+        {
+          "include": "#declaration-module"
+        },
+        {
+          "include": "#declaration-function"
+        },
+        {
+          "include": "#declaration-type"
+        }
+      ]
+    },
+    "declaration-function": {
+      "comment": "A definition may be named by a user-defined operator, e.g. `def >>`.",
+      "match": "(?<![A-Za-z0-9_!$])(def|redef|law)(?![A-Za-z0-9_!$])\\s+((?:[a-z_][A-Za-z0-9_!$]*|[A-Z][A-Za-z0-9_!$]*|[\\x{2200}-\\x{22FF}]+|[+\\-*<>=!&|^$]+))",
+      "captures": {
+        "1": {
+          "name": "storage.type.flix"
+        },
+        "2": {
+          "name": "entity.name.function.flix"
+        }
+      }
+    },
+    "declaration-type": {
+      "match": "(?<![A-Za-z0-9_!$])(enum|struct|trait|eff|instance|restrictable)(?![A-Za-z0-9_!$])\\s+([A-Z][A-Za-z0-9_!$]*)",
+      "captures": {
+        "1": {
+          "name": "storage.type.flix"
+        },
+        "2": {
+          "name": "entity.name.type.flix"
+        }
+      }
+    },
+    "declaration-type-alias": {
+      "comment": "Listed before #declaration-type so `type alias Foo` is not read as `type`.",
+      "match": "(?<![A-Za-z0-9_!$])(type)\\s+(alias)(?![A-Za-z0-9_!$])\\s+([A-Z][A-Za-z0-9_!$]*)",
+      "captures": {
+        "1": {
+          "name": "storage.type.flix"
+        },
+        "2": {
+          "name": "storage.type.flix"
+        },
+        "3": {
+          "name": "entity.name.type.flix"
+        }
+      }
+    },
+    "declaration-module": {
+      "match": "(?<![A-Za-z0-9_!$])(mod)(?![A-Za-z0-9_!$])\\s+([A-Z][A-Za-z0-9_!$]*(?:\\.[A-Z][A-Za-z0-9_!$]*)*)",
+      "captures": {
+        "1": {
+          "name": "storage.type.flix"
+        },
+        "2": {
+          "name": "entity.name.namespace.flix"
+        }
+      }
+    },
     "keywords": {
       "patterns": [
         {
@@ -367,6 +441,126 @@
         {
           "match": "(?<![A-Za-z0-9_!$])(?:Static|Univ)(?![A-Za-z0-9_!$])",
           "name": "support.type.builtin.flix"
+        }
+      ]
+    },
+    "names": {
+      "patterns": [
+        {
+          "include": "#primitive-type"
+        },
+        {
+          "include": "#math-name"
+        },
+        {
+          "include": "#escaped-name"
+        },
+        {
+          "include": "#wildcard"
+        }
+      ]
+    },
+    "primitive-type": {
+      "comment": "The `// Basic Types` table in Resolver.visitType: resolved structurally, before any name lookup, so unlike `Some` or `Nil` these cannot be shadowed by a user declaration. Scoping library constructors as language constants is defect #11e.",
+      "match": "(?<![A-Za-z0-9_!$])(?:BigDecimal|Receiver|Float32|Float64|BigInt|Region|Sender|String|Vector|Array|Int16|Int32|Int64|Regex|Bool|Char|Int8|Lazy|Null|Unit|Void)(?![A-Za-z0-9_!$])",
+      "name": "support.type.primitive.flix"
+    },
+    "math-name": {
+      "match": "[\\x{2200}-\\x{22FF}]+",
+      "name": "variable.other.math.flix"
+    },
+    "escaped-name": {
+      "comment": "`$name` escapes a name that would otherwise be a keyword; Lexer line 324.",
+      "match": "(\\$)([a-z_][A-Za-z0-9_!$]*|[A-Z][A-Za-z0-9_!$]*)",
+      "name": "variable.other.escaped.flix",
+      "captures": {
+        "1": {
+          "name": "punctuation.definition.variable.flix"
+        }
+      }
+    },
+    "wildcard": {
+      "comment": "TokenKind.Underscore. The leading guard matters as much as the trailing one: `_` is a name character, so the underscore in `case_` continues that name rather than starting a wildcard.",
+      "match": "(?<![A-Za-z0-9_!$])_(?![A-Za-z0-9_!$+\\-*<>=&|^\\x{2200}-\\x{22FF}])",
+      "name": "variable.language.wildcard.flix"
+    },
+    "operators": {
+      "patterns": [
+        {
+          "include": "#arrow-function"
+        },
+        {
+          "include": "#arrow-struct"
+        },
+        {
+          "include": "#operator"
+        },
+        {
+          "include": "#punctuation"
+        }
+      ]
+    },
+    "arrow-function": {
+      "comment": "Whitespace on either side makes this the function arrow, per Lexer.scanToken.",
+      "match": "(?<=\\s)->|->(?=\\s)",
+      "name": "keyword.operator.arrow.flix"
+    },
+    "arrow-struct": {
+      "comment": "No surrounding whitespace: struct field access, TokenKind.ArrowThinRTight.",
+      "match": "->",
+      "name": "keyword.operator.accessor.flix"
+    },
+    "operator": {
+      "comment": "Flix admits user-defined operators, so this is a character class rather than an enumeration of Lexer.Operators. The named entries are a subset of what this matches.",
+      "match": "(?:(?<![A-Za-z0-9_!$])[+\\-*<>=!&|^$]|[+\\-*<>=&|^])[+\\-*<>=!&|^$]*",
+      "name": "keyword.operator.flix"
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "match": "[{}]",
+          "name": "punctuation.section.braces.flix"
+        },
+        {
+          "match": "[()]",
+          "name": "punctuation.section.parens.flix"
+        },
+        {
+          "match": "\\[|\\]",
+          "name": "punctuation.section.brackets.flix"
+        },
+        {
+          "comment": "Defect #11c: the incumbent scopes `;` as keyword.control.",
+          "match": ";",
+          "name": "punctuation.terminator.flix"
+        },
+        {
+          "match": ",",
+          "name": "punctuation.separator.comma.flix"
+        },
+        {
+          "match": ":::|::|:-|:",
+          "name": "punctuation.separator.colon.flix"
+        },
+        {
+          "match": "\\.",
+          "name": "punctuation.accessor.flix"
+        },
+        {
+          "match": "\\\\",
+          "name": "punctuation.definition.lambda.flix"
+        },
+        {
+          "match": "`",
+          "name": "punctuation.definition.infix.flix"
+        },
+        {
+          "match": "~",
+          "name": "keyword.operator.flix"
+        },
+        {
+          "match": "@",
+          "name": "punctuation.definition.annotation.flix"
         }
       ]
     }

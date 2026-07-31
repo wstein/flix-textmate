@@ -36,7 +36,9 @@
 #     ^^^^^^^ source.flix string.quoted.double.flix
 #            ^ source.flix string.quoted.double.flix punctuation.definition.template-expression.begin.flix
 #             ^ source.flix string.quoted.double.flix punctuation.definition.template-expression.begin.flix
-#              ^^^^ source.flix string.quoted.double.flix meta.embedded.line.flix
+#              ^^ source.flix string.quoted.double.flix meta.embedded.line.flix
+#                ^ source.flix string.quoted.double.flix meta.embedded.line.flix keyword.operator.flix
+#                 ^ source.flix string.quoted.double.flix meta.embedded.line.flix
 #                  ^ source.flix string.quoted.double.flix meta.embedded.line.flix constant.numeric.flix
 #                   ^ source.flix string.quoted.double.flix punctuation.definition.template-expression.end.flix
 #                    ^ source.flix string.quoted.double.flix
@@ -50,7 +52,9 @@
 #              ^ source.flix string.quoted.double.flix meta.embedded.line.flix
 #               ^ source.flix string.quoted.double.flix meta.embedded.line.flix
 #                ^^ source.flix string.quoted.double.flix meta.embedded.line.flix constant.numeric.flix
-#                  ^^^ source.flix string.quoted.double.flix meta.embedded.line.flix
+#                  ^ source.flix string.quoted.double.flix meta.embedded.line.flix
+#                   ^ source.flix string.quoted.double.flix meta.embedded.line.flix keyword.operator.flix
+#                    ^ source.flix string.quoted.double.flix meta.embedded.line.flix
 #                     ^ source.flix string.quoted.double.flix meta.embedded.line.flix constant.numeric.flix
 #                      ^ source.flix string.quoted.double.flix meta.embedded.line.flix
 #                       ^ source.flix string.quoted.double.flix meta.embedded.line.flix
