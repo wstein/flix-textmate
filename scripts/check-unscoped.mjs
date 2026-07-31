@@ -54,6 +54,11 @@ const MUST_BE_UNSCOPED = [
     subject: '1',
     why: 'a second `.` continues the same erroneous number token',
   },
+  // `$` and `_` are name characters, so a name containing one is a single token.
+  // Lexer.acceptName's docstring cites Java inner-class spellings as why `$` is included.
+  { text: 'Map$Entry', why: 'a Java inner-class name is one NameUppercase token' },
+  { text: 'HttpClient$Redirect', why: 'as above; appears in Net/HttpLayer.flix' },
+  { text: '9x?', why: 'isNumberLikeChar folds the trailing letters into one bad number' },
 ];
 
 const grammar = await loadGrammar();

@@ -304,8 +304,8 @@
           "name": "constant.language.hole.flix"
         },
         {
-          "comment": "`name?` is TokenKind.HoleVariable; Lexer.acceptName returns it when a name is followed by `?`.",
-          "match": "[A-Za-z][A-Za-z0-9_!$]*\\?",
+          "comment": "`name?` is TokenKind.HoleVariable; Lexer.acceptName returns it when a name is followed by `?`. The leading guard matters as much as it does for #wildcard: without it `9x?` scopes only the `x?`, painting half of what the lexer treats as one erroneous token. A leading `_` is included because Lexer.scanToken routes `_` followed by a name character into acceptName.",
+          "match": "(?<![A-Za-z0-9_!$])[A-Za-z_][A-Za-z0-9_!$]*\\?",
           "name": "constant.language.hole.flix"
         }
       ]
@@ -470,8 +470,8 @@
       "name": "variable.other.math.flix"
     },
     "escaped-name": {
-      "comment": "`$name` escapes a name that would otherwise be a keyword; Lexer line 324.",
-      "match": "(\\$)([a-z_][A-Za-z0-9_!$]*|[A-Z][A-Za-z0-9_!$]*)",
+      "comment": "`$name` escapes a name that would otherwise be a keyword (Lexer.acceptEscapedName). The leading guard is essential: `$` is also a name character, and Lexer.acceptName names Java inner-class spellings such as `Map$Entry` as the reason. Without it, `Map$Entry` is split at the `$` into two differently scoped tokens.",
+      "match": "(?<![A-Za-z0-9_!$])(\\$)([a-z_][A-Za-z0-9_!$]*|[A-Z][A-Za-z0-9_!$]*)",
       "name": "variable.other.escaped.flix",
       "captures": {
         "1": {
@@ -511,6 +511,12 @@
           "include": "#operator"
         },
         {
+          "include": "#operator-slash"
+        },
+        {
+          "include": "#operator-misc"
+        },
+        {
           "include": "#punctuation"
         }
       ]
@@ -523,12 +529,12 @@
         },
         {
           "comment": "Rule implication, TokenKind.ColonMinus.",
-          "match": ":-",
+          "match": ":-(?![+\\-*<>=!&|^$])",
           "name": "keyword.operator.datalog.flix"
         },
         {
           "comment": "Fixpoint merge, TokenKind.AngledPlus.",
-          "match": "<\\+>",
+          "match": "<\\+>(?![+\\-*<>=!&|^$])",
           "name": "keyword.operator.datalog.flix"
         }
       ]
@@ -577,17 +583,27 @@
     },
     "arrow-function": {
       "comment": "Whitespace on either side makes this the function arrow, per Lexer.scanToken.",
-      "match": "(?<=\\s)->|->(?=\\s)",
+      "match": "(?:(?<=\\s)->|->(?=\\s))(?![+\\-*<>=!&|^$])",
       "name": "keyword.operator.arrow.flix"
     },
     "arrow-struct": {
-      "comment": "No surrounding whitespace: struct field access, TokenKind.ArrowThinRTight.",
-      "match": "->",
+      "comment": "No surrounding whitespace: struct field access, TokenKind.ArrowThinRTight. #struct-access above needs no such guard: it already requires a lowercase name after the arrow, which is never an operator character.",
+      "match": "->(?![+\\-*<>=!&|^$])",
       "name": "keyword.operator.accessor.flix"
     },
     "operator": {
       "comment": "Flix admits user-defined operators, so this is a character class rather than an enumeration of Lexer.Operators. The named entries are a subset of what this matches.",
       "match": "(?:(?<![A-Za-z0-9_!$])[+\\-*<>=!&|^$]|[+\\-*<>=&|^])[+\\-*<>=!&|^$]*",
+      "name": "keyword.operator.flix"
+    },
+    "operator-misc": {
+      "comment": "Operator tokens outside Lexer.isUserOp. `~` is TokenKind.Tilde. A bare `@` is TokenKind.At, the region operator in `new Struct @ rc {...}` (Parser2.regionName) -- not annotation punctuation, which is why the lookahead defers to #annotations.",
+      "match": "~|@(?![A-Za-z])",
+      "name": "keyword.operator.flix"
+    },
+    "operator-slash": {
+      "comment": "`/` is TokenKind.Slash, a real operator. Lexer.isUserOp excludes it only so that `//` can begin a comment, so it is absent from #operator and needs its own rule. The lookahead is belt-and-braces: #comments is matched before #operators, so a comment already wins the tie at the same offset.",
+      "match": "/(?![/*])",
       "name": "keyword.operator.flix"
     },
     "punctuation": {
@@ -624,14 +640,6 @@
         {
           "match": "`",
           "name": "punctuation.definition.infix.flix"
-        },
-        {
-          "match": "~",
-          "name": "keyword.operator.flix"
-        },
-        {
-          "match": "@",
-          "name": "punctuation.definition.annotation.flix"
         }
       ]
     }

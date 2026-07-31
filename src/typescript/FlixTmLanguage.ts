@@ -399,8 +399,11 @@ const literals: Record<string, Rule> = {
       {
         comment:
           '`name?` is TokenKind.HoleVariable; Lexer.acceptName returns it when a name is ' +
-          'followed by `?`.',
-        match: '[A-Za-z][A-Za-z0-9_!$]*\\?',
+          'followed by `?`. The leading guard matters as much as it does for #wildcard: ' +
+          'without it `9x?` scopes only the `x?`, painting half of what the lexer treats ' +
+          'as one erroneous token. A leading `_` is included because Lexer.scanToken ' +
+          'routes `_` followed by a name character into acceptName.',
+        match: `(?<!${NAME_CHAR})[A-Za-z_]${NAME_CHAR}*\\?`,
         name: 'constant.language.hole.flix',
       },
     ],
@@ -499,6 +502,19 @@ const USER_OP = '[+\\-*<>=!&|^$]+';
  */
 const USER_OP_START = `(?:(?<!${NAME_CHAR})[+\\-*<>=!&|^$]|[+\\-*<>=&|^])[+\\-*<>=!&|^$]*`;
 
+/**
+ * Guard for a *fixed* operator spelling: the lexer accepts one only when no further
+ * operator character follows.
+ *
+ * `Lexer.acceptIfOperator` is `advanceIfInTree(Operators, c => !isUserOp(c))`, and the `->`
+ * dispatch in `Lexer.scanToken` carries the same `nthIs(1, c => !isUserOp(c))` condition.
+ * Without it, a user-defined operator that merely *starts* with a known spelling gets split:
+ * `a->>b` would scope `->` as struct access and leave a stray `>`, where the lexer produces
+ * the single operator `->>`. Flix defines operators such as `>=>` and `<><` in its own
+ * corpus, so this is live syntax rather than a hypothetical.
+ */
+const NOT_USER_OP_NEXT = '(?![+\\-*<>=!&|^$])';
+
 /** Any name that may follow `def`, including operator and math spellings. */
 const DEFINITION_NAME = `(?:${LOWER_NAME}|${UPPER_NAME}|${MATH_NAME}|${USER_OP})`;
 
@@ -590,8 +606,12 @@ const names: Record<string, Rule> = {
   },
 
   'escaped-name': {
-    comment: '`$name` escapes a name that would otherwise be a keyword; Lexer line 324.',
-    match: `(\\$)(${LOWER_NAME}|${UPPER_NAME})`,
+    comment:
+      '`$name` escapes a name that would otherwise be a keyword (Lexer.acceptEscapedName). ' +
+      'The leading guard is essential: `$` is also a name character, and ' +
+      'Lexer.acceptName names Java inner-class spellings such as `Map$Entry` as the reason. ' +
+      'Without it, `Map$Entry` is split at the `$` into two differently scoped tokens.',
+    match: `(?<!${NAME_CHAR})(\\$)(${LOWER_NAME}|${UPPER_NAME})`,
     name: 'variable.other.escaped.flix',
     captures: { '1': { name: 'punctuation.definition.variable.flix' } },
   },
@@ -627,6 +647,8 @@ const operators: Record<string, Rule> = {
       { include: '#arrow-struct' },
       { include: '#effect-separator' },
       { include: '#operator' },
+      { include: '#operator-slash' },
+      { include: '#operator-misc' },
       { include: '#punctuation' },
     ],
   },
@@ -653,12 +675,12 @@ const operators: Record<string, Rule> = {
       },
       {
         comment: 'Rule implication, TokenKind.ColonMinus.',
-        match: ':-',
+        match: `:-${NOT_USER_OP_NEXT}`,
         name: 'keyword.operator.datalog.flix',
       },
       {
         comment: 'Fixpoint merge, TokenKind.AngledPlus.',
-        match: '<\\+>',
+        match: `<\\+>${NOT_USER_OP_NEXT}`,
         name: 'keyword.operator.datalog.flix',
       },
     ],
@@ -705,13 +727,16 @@ const operators: Record<string, Rule> = {
   'arrow-function': {
     comment:
       'Whitespace on either side makes this the function arrow, per Lexer.scanToken.',
-    match: '(?<=\\s)->|->(?=\\s)',
+    match: `(?:(?<=\\s)->|->(?=\\s))${NOT_USER_OP_NEXT}`,
     name: 'keyword.operator.arrow.flix',
   },
 
   'arrow-struct': {
-    comment: 'No surrounding whitespace: struct field access, TokenKind.ArrowThinRTight.',
-    match: '->',
+    comment:
+      'No surrounding whitespace: struct field access, TokenKind.ArrowThinRTight. ' +
+      '#struct-access above needs no such guard: it already requires a lowercase name ' +
+      'after the arrow, which is never an operator character.',
+    match: `->${NOT_USER_OP_NEXT}`,
     name: 'keyword.operator.accessor.flix',
   },
 
@@ -720,6 +745,25 @@ const operators: Record<string, Rule> = {
       'Flix admits user-defined operators, so this is a character class rather than an ' +
       'enumeration of Lexer.Operators. The named entries are a subset of what this matches.',
     match: USER_OP_START,
+    name: 'keyword.operator.flix',
+  },
+
+  'operator-misc': {
+    comment:
+      'Operator tokens outside Lexer.isUserOp. `~` is TokenKind.Tilde. A bare `@` is ' +
+      'TokenKind.At, the region operator in `new Struct @ rc {...}` (Parser2.regionName) ' +
+      '-- not annotation punctuation, which is why the lookahead defers to #annotations.',
+    match: '~|@(?![A-Za-z])',
+    name: 'keyword.operator.flix',
+  },
+
+  'operator-slash': {
+    comment:
+      '`/` is TokenKind.Slash, a real operator. Lexer.isUserOp excludes it only so that ' +
+      '`//` can begin a comment, so it is absent from #operator and needs its own rule. ' +
+      'The lookahead is belt-and-braces: #comments is matched before #operators, so a ' +
+      'comment already wins the tie at the same offset.',
+    match: '/(?![/*])',
     name: 'keyword.operator.flix',
   },
 
@@ -737,8 +781,6 @@ const operators: Record<string, Rule> = {
       { match: ':::|::|:', name: 'punctuation.separator.colon.flix' },
       { match: '\\.', name: 'punctuation.accessor.flix' },
       { match: '`', name: 'punctuation.definition.infix.flix' },
-      { match: '~', name: 'keyword.operator.flix' },
-      { match: '@', name: 'punctuation.definition.annotation.flix' },
     ],
   },
 };

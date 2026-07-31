@@ -83,3 +83,34 @@
 
     let _ = 1
 //      ^ variable.language.wildcard.flix
+
+// --- `/` is TokenKind.Slash, a real operator. Lexer.isUserOp excludes it only so that
+// `//` can begin a comment, so it needs a rule of its own.
+
+    let q = a / b
+//            ^ keyword.operator.flix
+
+// --- Lexer accepts a fixed operator spelling only when no further operator character
+// follows (advanceIfInTree(Operators, c => !isUserOp(c))). A user-defined operator that
+// merely starts with a known spelling must not be split.
+
+    a->>b
+//   ^^^ keyword.operator.flix
+//   ^^^ - keyword.operator.accessor.flix
+
+    x <+>> y
+//    ^^^^ keyword.operator.flix
+//    ^^^^ - keyword.operator.datalog.flix
+
+// --- A bare `@` is TokenKind.At, the region operator in `new Struct @ rc {}`
+// (Parser2.regionName) -- not annotation punctuation.
+
+    new Struct @ rc {}
+//             ^ keyword.operator.flix
+//             ^ - punctuation.definition.annotation.flix
+
+// --- A leading `_` is part of the hole name: Lexer.scanToken routes `_` followed by a
+// name character into acceptName, which returns HoleVariable on the trailing `?`.
+
+    _x?
+//  ^^^ constant.language.hole.flix
