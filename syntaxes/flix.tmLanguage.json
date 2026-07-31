@@ -487,10 +487,25 @@
     "operators": {
       "patterns": [
         {
+          "include": "#datalog"
+        },
+        {
+          "include": "#extensible-type"
+        },
+        {
+          "include": "#record-lookup"
+        },
+        {
+          "include": "#struct-access"
+        },
+        {
           "include": "#arrow-function"
         },
         {
           "include": "#arrow-struct"
+        },
+        {
+          "include": "#effect-separator"
         },
         {
           "include": "#operator"
@@ -499,6 +514,66 @@
           "include": "#punctuation"
         }
       ]
+    },
+    "datalog": {
+      "patterns": [
+        {
+          "match": "#\\{|#\\(",
+          "name": "punctuation.section.datalog.begin.flix"
+        },
+        {
+          "comment": "Rule implication, TokenKind.ColonMinus.",
+          "match": ":-",
+          "name": "keyword.operator.datalog.flix"
+        },
+        {
+          "comment": "Fixpoint merge, TokenKind.AngledPlus.",
+          "match": "<\\+>",
+          "name": "keyword.operator.datalog.flix"
+        }
+      ]
+    },
+    "extensible-type": {
+      "comment": "`#| ... |#`, Parser2.extensibleType. Not Datalog despite the leading `#`.",
+      "patterns": [
+        {
+          "match": "#\\|",
+          "name": "punctuation.section.extensible.begin.flix"
+        },
+        {
+          "match": "\\|#",
+          "name": "punctuation.section.extensible.end.flix"
+        }
+      ]
+    },
+    "record-lookup": {
+      "comment": "A bare `#` followed by a lowercase name is a record select (Parser2, `case TokenKind.Hash if nth(1) == TokenKind.NameLowercase`), not a Datalog form.",
+      "match": "(#)([a-z_][A-Za-z0-9_!$]*)",
+      "captures": {
+        "1": {
+          "name": "punctuation.accessor.flix"
+        },
+        "2": {
+          "name": "variable.other.member.flix"
+        }
+      }
+    },
+    "struct-access": {
+      "comment": "Tight `->` followed by a lowercase name is a struct get or put, per Parser2 `case TokenKind.ArrowThinRTight if nth(1) == TokenKind.NameLowercase`.",
+      "match": "(?<=[A-Za-z0-9_!$])(->)([a-z_][A-Za-z0-9_!$]*)",
+      "captures": {
+        "1": {
+          "name": "keyword.operator.accessor.flix"
+        },
+        "2": {
+          "name": "variable.other.member.flix"
+        }
+      }
+    },
+    "effect-separator": {
+      "comment": "`\\` separates a type from its effect set, per Type.typeAndEffect — `def f(): t \\ ef`. It is not a lambda: Flix lambdas are written `x -> e`.",
+      "match": "\\\\",
+      "name": "keyword.operator.effect.flix"
     },
     "arrow-function": {
       "comment": "Whitespace on either side makes this the function arrow, per Lexer.scanToken.",
@@ -539,16 +614,12 @@
           "name": "punctuation.separator.comma.flix"
         },
         {
-          "match": ":::|::|:-|:",
+          "match": ":::|::|:",
           "name": "punctuation.separator.colon.flix"
         },
         {
           "match": "\\.",
           "name": "punctuation.accessor.flix"
-        },
-        {
-          "match": "\\\\",
-          "name": "punctuation.definition.lambda.flix"
         },
         {
           "match": "`",

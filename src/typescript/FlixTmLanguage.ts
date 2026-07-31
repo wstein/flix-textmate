@@ -617,11 +617,89 @@ const names: Record<string, Rule> = {
 const operators: Record<string, Rule> = {
   operators: {
     patterns: [
+      // Multi-character forms first: `#{`, `|#`, and `:-` all begin with a character the
+      // generic operator or punctuation rules would otherwise consume on its own.
+      { include: '#datalog' },
+      { include: '#extensible-type' },
+      { include: '#record-lookup' },
+      { include: '#struct-access' },
       { include: '#arrow-function' },
       { include: '#arrow-struct' },
+      { include: '#effect-separator' },
       { include: '#operator' },
       { include: '#punctuation' },
     ],
+  },
+
+  /**
+   * The fixpoint sub-language.
+   *
+   * These four forms carry no other meaning in Flix, so they get the deliberate
+   * `.datalog.` scope segment: `#{` opens a constraint set (Parser2.fixpointConstraintSetExpr),
+   * `#(` a fixpoint lambda or schema row type, `:-` separates a rule head from its body,
+   * and `<+>` is the fixpoint merge operator. Keywords with a second role — `select`,
+   * `where`, `with`, `from`, `into` — are deliberately excluded; see KEYWORD_SCOPES.
+   *
+   * The constraint terminator `.` (TokenKind.DotWhiteSpace) is *not* here. Distinguishing
+   * it from a qualified-name separator requires knowing whether an enclosing constraint is
+   * open, which a regex stack machine cannot track — it is one of the four cases
+   * tree-sitter-flix needs an external scanner for.
+   */
+  datalog: {
+    patterns: [
+      {
+        match: '#\\{|#\\(',
+        name: 'punctuation.section.datalog.begin.flix',
+      },
+      {
+        comment: 'Rule implication, TokenKind.ColonMinus.',
+        match: ':-',
+        name: 'keyword.operator.datalog.flix',
+      },
+      {
+        comment: 'Fixpoint merge, TokenKind.AngledPlus.',
+        match: '<\\+>',
+        name: 'keyword.operator.datalog.flix',
+      },
+    ],
+  },
+
+  'extensible-type': {
+    comment: '`#| ... |#`, Parser2.extensibleType. Not Datalog despite the leading `#`.',
+    patterns: [
+      { match: '#\\|', name: 'punctuation.section.extensible.begin.flix' },
+      { match: '\\|#', name: 'punctuation.section.extensible.end.flix' },
+    ],
+  },
+
+  'record-lookup': {
+    comment:
+      'A bare `#` followed by a lowercase name is a record select (Parser2, ' +
+      '`case TokenKind.Hash if nth(1) == TokenKind.NameLowercase`), not a Datalog form.',
+    match: `(#)(${LOWER_NAME})`,
+    captures: {
+      '1': { name: 'punctuation.accessor.flix' },
+      '2': { name: 'variable.other.member.flix' },
+    },
+  },
+
+  'struct-access': {
+    comment:
+      'Tight `->` followed by a lowercase name is a struct get or put, per Parser2 ' +
+      '`case TokenKind.ArrowThinRTight if nth(1) == TokenKind.NameLowercase`.',
+    match: `(?<=${NAME_CHAR})(->)(${LOWER_NAME})`,
+    captures: {
+      '1': { name: 'keyword.operator.accessor.flix' },
+      '2': { name: 'variable.other.member.flix' },
+    },
+  },
+
+  'effect-separator': {
+    comment:
+      '`\\` separates a type from its effect set, per Type.typeAndEffect — `def f(): t \\ ef`. ' +
+      'It is not a lambda: Flix lambdas are written `x -> e`.',
+    match: '\\\\',
+    name: 'keyword.operator.effect.flix',
   },
 
   'arrow-function': {
@@ -656,9 +734,8 @@ const operators: Record<string, Rule> = {
         name: 'punctuation.terminator.flix',
       },
       { match: ',', name: 'punctuation.separator.comma.flix' },
-      { match: ':::|::|:-|:', name: 'punctuation.separator.colon.flix' },
+      { match: ':::|::|:', name: 'punctuation.separator.colon.flix' },
       { match: '\\.', name: 'punctuation.accessor.flix' },
-      { match: '\\\\', name: 'punctuation.definition.lambda.flix' },
       { match: '`', name: 'punctuation.definition.infix.flix' },
       { match: '~', name: 'keyword.operator.flix' },
       { match: '@', name: 'punctuation.definition.annotation.flix' },

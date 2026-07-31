@@ -1,0 +1,165 @@
+>    let rules = #{
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^^^^^^^ source.flix
+#              ^ source.flix keyword.operator.flix
+#               ^ source.flix
+#                ^^ source.flix punctuation.section.datalog.begin.flix
+>        Path(x, y) :- Edge(x, y).
+#^^^^^^^^^^^^ source.flix
+#            ^ source.flix punctuation.section.parens.flix
+#             ^ source.flix
+#              ^ source.flix punctuation.separator.comma.flix
+#               ^^ source.flix
+#                 ^ source.flix punctuation.section.parens.flix
+#                  ^ source.flix
+#                   ^^ source.flix keyword.operator.datalog.flix
+#                     ^^^^^ source.flix
+#                          ^ source.flix punctuation.section.parens.flix
+#                           ^ source.flix
+#                            ^ source.flix punctuation.separator.comma.flix
+#                             ^^ source.flix
+#                               ^ source.flix punctuation.section.parens.flix
+#                                ^ source.flix punctuation.accessor.flix
+>        Path(x, z) :- Path(x, y), Edge(y, z).
+#^^^^^^^^^^^^ source.flix
+#            ^ source.flix punctuation.section.parens.flix
+#             ^ source.flix
+#              ^ source.flix punctuation.separator.comma.flix
+#               ^^ source.flix
+#                 ^ source.flix punctuation.section.parens.flix
+#                  ^ source.flix
+#                   ^^ source.flix keyword.operator.datalog.flix
+#                     ^^^^^ source.flix
+#                          ^ source.flix punctuation.section.parens.flix
+#                           ^ source.flix
+#                            ^ source.flix punctuation.separator.comma.flix
+#                             ^^ source.flix
+#                               ^ source.flix punctuation.section.parens.flix
+#                                ^ source.flix punctuation.separator.comma.flix
+#                                 ^^^^^ source.flix
+#                                      ^ source.flix punctuation.section.parens.flix
+#                                       ^ source.flix
+#                                        ^ source.flix punctuation.separator.comma.flix
+#                                         ^^ source.flix
+#                                           ^ source.flix punctuation.section.parens.flix
+#                                            ^ source.flix punctuation.accessor.flix
+>    };
+#^^^^ source.flix
+#    ^ source.flix punctuation.section.braces.flix
+#     ^ source.flix punctuation.terminator.flix
+>    let merged = db1 <+> db2;
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^^^^^^^^ source.flix
+#               ^ source.flix keyword.operator.flix
+#                ^^^^^ source.flix
+#                     ^^^ source.flix keyword.operator.datalog.flix
+#                        ^^^^ source.flix
+#                            ^ source.flix punctuation.terminator.flix
+>    query db select (x, y) from Path(x, y) where x < y
+#^^^^ source.flix
+#    ^^^^^ source.flix keyword.control.datalog.flix
+#         ^^^^ source.flix
+#             ^^^^^^ source.flix keyword.control.flix
+#                   ^ source.flix
+#                    ^ source.flix punctuation.section.parens.flix
+#                     ^ source.flix
+#                      ^ source.flix punctuation.separator.comma.flix
+#                       ^^ source.flix
+#                         ^ source.flix punctuation.section.parens.flix
+#                          ^ source.flix
+#                           ^^^^ source.flix keyword.other.flix
+#                               ^^^^^ source.flix
+#                                    ^ source.flix punctuation.section.parens.flix
+#                                     ^ source.flix
+#                                      ^ source.flix punctuation.separator.comma.flix
+#                                       ^^ source.flix
+#                                         ^ source.flix punctuation.section.parens.flix
+#                                          ^ source.flix
+#                                           ^^^^^ source.flix keyword.other.flix
+#                                                ^^^ source.flix
+#                                                   ^ source.flix keyword.operator.flix
+#                                                    ^^^ source.flix
+>    let lam = #(x) -> x;
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^^^^^ source.flix
+#            ^ source.flix keyword.operator.flix
+#             ^ source.flix
+#              ^^ source.flix punctuation.section.datalog.begin.flix
+#                ^ source.flix
+#                 ^ source.flix punctuation.section.parens.flix
+#                  ^ source.flix
+#                   ^^ source.flix keyword.operator.arrow.flix
+#                     ^^ source.flix
+#                       ^ source.flix punctuation.terminator.flix
+>    def f(): Int32 \ IO = 1
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^ source.flix
+#        ^ source.flix entity.name.function.flix
+#         ^ source.flix punctuation.section.parens.flix
+#          ^ source.flix punctuation.section.parens.flix
+#           ^ source.flix punctuation.separator.colon.flix
+#            ^ source.flix
+#             ^^^^^ source.flix support.type.primitive.flix
+#                  ^ source.flix
+#                   ^ source.flix keyword.operator.effect.flix
+#                    ^^^^ source.flix
+#                        ^ source.flix keyword.operator.flix
+#                         ^ source.flix
+#                          ^ source.flix constant.numeric.flix
+>    def g(): Int32 \ {} = 2
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^ source.flix
+#        ^ source.flix entity.name.function.flix
+#         ^ source.flix punctuation.section.parens.flix
+#          ^ source.flix punctuation.section.parens.flix
+#           ^ source.flix punctuation.separator.colon.flix
+#            ^ source.flix
+#             ^^^^^ source.flix support.type.primitive.flix
+#                  ^ source.flix
+#                   ^ source.flix keyword.operator.effect.flix
+#                    ^ source.flix
+#                     ^ source.flix punctuation.section.braces.flix
+#                      ^ source.flix punctuation.section.braces.flix
+#                       ^ source.flix
+#                        ^ source.flix keyword.operator.flix
+#                         ^ source.flix
+#                          ^ source.flix constant.numeric.flix
+>    let r = person#name;
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^^^ source.flix
+#          ^ source.flix keyword.operator.flix
+#           ^^^^^^^ source.flix
+#                  ^ source.flix punctuation.accessor.flix
+#                   ^^^^ source.flix variable.other.member.flix
+#                       ^ source.flix punctuation.terminator.flix
+>    let s = node->value;
+#^^^^ source.flix
+#    ^^^ source.flix storage.type.flix
+#       ^^^ source.flix
+#          ^ source.flix keyword.operator.flix
+#           ^^^^^ source.flix
+#                ^^ source.flix keyword.operator.accessor.flix
+#                  ^^^^^ source.flix variable.other.member.flix
+#                       ^ source.flix punctuation.terminator.flix
+>    type alias Row = #| A, B |#
+#^^^^ source.flix
+#    ^^^^ source.flix storage.type.flix
+#        ^ source.flix
+#         ^^^^^ source.flix storage.type.flix
+#              ^ source.flix
+#               ^^^ source.flix entity.name.type.flix
+#                  ^ source.flix
+#                   ^ source.flix keyword.operator.flix
+#                    ^ source.flix
+#                     ^^ source.flix punctuation.section.extensible.begin.flix
+#                       ^^ source.flix
+#                         ^ source.flix punctuation.separator.comma.flix
+#                          ^^^ source.flix
+#                             ^^ source.flix punctuation.section.extensible.end.flix
+>

@@ -156,7 +156,7 @@
 #          ^ source.flix keyword.operator.flix
 #           ^^^^^^^ source.flix
 #                  ^^ source.flix keyword.operator.accessor.flix
-#                    ^^^^^ source.flix
+#                    ^^^^ source.flix variable.other.member.flix
 >    let q = person -> name
 #^^^^ source.flix
 #    ^^^ source.flix storage.type.flix
