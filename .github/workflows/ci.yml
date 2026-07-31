@@ -32,6 +32,12 @@ jobs:
       - name: Grammar is up to date
         run: npm run check:build
 
+      # The lexicon manifest is generated and committed. Prettier is configured not to
+      # touch it, because reformatting a generated file makes the committed copy stop
+      # matching what its generator emits.
+      - name: Lexicon manifest is unmodified
+        run: git diff --exit-code -- src/typescript/lexicon.generated.ts
+
       - name: Unit tests
         run: npm run test:unit
 

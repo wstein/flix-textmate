@@ -68,7 +68,10 @@ keywords that are not in `Lexer.Keywords` (`dbg`, `typematch`, `resume`, `branch
   `` `${string}.flix` ``, which makes an unsuffixed scope a compile error.
 - `src/typescript/lexicon.generated.ts` — keywords, operators, simple tokens, and
   annotation names extracted from the compiler by `scripts/extract-lexicon.mjs`. Committed,
-  so CI needs no compiler checkout. Never hand-edit; re-run the extractor.
+  so CI needs no compiler checkout. Never hand-edit; re-run the extractor. It is excluded
+  from Prettier on purpose: reformatting a generated file makes the committed copy stop
+  matching what its generator emits, so every regeneration would dirty the tree.
+  `npm run check:lexicon` catches that.
 - `src/typescript/FlixTmLanguage.ts` — the grammar. The only hand-written rule source. Its
   `KEYWORD_SCOPES` is typed `Record<Keyword, ScopeName>`, so an unclassified, removed, or
   invented keyword is a compile error.

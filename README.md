@@ -75,7 +75,12 @@ compiler checkout:
 
 ```bash
 npm run extract:lexicon -- --flix-source ~/github.com/wstein/flix-fork
+npm run check:lexicon   # fail if the committed manifest differs from a fresh extraction
 ```
+
+`lexicon.generated.ts` is excluded from Prettier. Reformatting a generated file means the
+committed copy stops matching what its generator emits, so regenerating always dirties the
+tree — `check:lexicon` is what makes that visible.
 
 The grammar maps that manifest with `Record<Keyword, ScopeName>`, so a keyword added to or
 removed from Flix becomes a **type error** until it is classified. Combined with
