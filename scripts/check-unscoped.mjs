@@ -37,6 +37,12 @@ const MUST_BE_UNSCOPED = [
   { text: 'defer', why: 'merely starts with `def`' },
   { text: 'iffy', why: 'merely starts with `if`' },
   { text: 'newtype', why: 'merely starts with `new`' },
+  // Malformed literals. `Lexer.isNumberLikeChar` folds any trailing `[0-9A-Za-z_.]` into
+  // the same erroneous token, so the grammar must not scope the valid-looking prefix.
+  { text: '32q', why: 'an invalid suffix is part of the same number token' },
+  { text: '1__2', why: 'the digit separator is `[0-9]+(_[0-9]+)*`, not `(_*[0-9])*`' },
+  { text: '0xZZ', why: 'no hex digits follow `0x`' },
+  { text: '1.0.5', why: 'a second `.` continues the same erroneous number token' },
 ];
 
 const grammar = await loadGrammar();

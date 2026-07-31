@@ -1,7 +1,8 @@
 >    def f(): Int32 = 1
 #^^^^ source.flix
 #    ^^^ source.flix storage.type.flix
-#       ^^^^^^^^^^^^^^^^ source.flix
+#       ^^^^^^^^^^^^^^ source.flix
+#                     ^ source.flix constant.numeric.flix
 >    pub def g(x: Bool): Bool = if (x) not x else x
 #^^^^ source.flix
 #    ^^^ source.flix storage.modifier.flix
@@ -15,7 +16,8 @@
 #                                            ^^^^ source.flix keyword.control.conditional.flix
 #                                                ^^^ source.flix
 >    let! y = 1
-#^^^^^^^^^^^^^^^ source.flix
+#^^^^^^^^^^^^^ source.flix
+#             ^ source.flix constant.numeric.flix
 >    forall forA forM foreach
 #^^^^ source.flix
 #    ^^^^^^ source.flix keyword.other.flix
@@ -64,7 +66,13 @@
 >    List#{1, 2, 3}
 #^^^^ source.flix
 #    ^^^^^ source.flix keyword.operator.new.flix
-#         ^^^^^^^^^^ source.flix
+#         ^ source.flix
+#          ^ source.flix constant.numeric.flix
+#           ^^ source.flix
+#             ^ source.flix constant.numeric.flix
+#              ^^ source.flix
+#                ^ source.flix constant.numeric.flix
+#                 ^^ source.flix
 >    @Tailrec
 #^^^^ source.flix
 #    ^ source.flix storage.type.annotation.flix punctuation.definition.annotation.flix
@@ -87,5 +95,6 @@
 >    let z = 1
 #^^^^ source.flix
 #    ^^^ source.flix storage.type.flix
-#       ^^^^^^^ source.flix
+#       ^^^^^ source.flix
+#            ^ source.flix constant.numeric.flix
 >

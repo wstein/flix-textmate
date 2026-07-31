@@ -1,0 +1,109 @@
+>    0x1F
+#^^^^ source.flix
+#    ^^^^ source.flix constant.numeric.hex.flix
+>    0xDEAD_BEEFi64
+#^^^^ source.flix
+#    ^^^^^^^^^^^^^^ source.flix constant.numeric.hex.flix
+>    1.0ff
+#^^^^ source.flix
+#    ^^^^^ source.flix constant.numeric.flix
+>    1_000_000i64
+#^^^^ source.flix
+#    ^^^^^^^^^^^^ source.flix constant.numeric.flix
+>    2.1e4
+#^^^^ source.flix
+#    ^^^^^ source.flix constant.numeric.flix
+>    1.5e-3f32
+#^^^^ source.flix
+#    ^^^^^^^^^ source.flix constant.numeric.flix
+>    32q
+#^^^^^^^^ source.flix
+>    "plain string"
+#^^^^ source.flix
+#    ^ source.flix string.quoted.double.flix punctuation.definition.string.begin.flix
+#     ^^^^^^^^^^^^ source.flix string.quoted.double.flix
+#                 ^ source.flix string.quoted.double.flix punctuation.definition.string.end.flix
+>    "with \n escape and ÿ unicode"
+#^^^^ source.flix
+#    ^ source.flix string.quoted.double.flix punctuation.definition.string.begin.flix
+#     ^^^^^ source.flix string.quoted.double.flix
+#          ^^ source.flix string.quoted.double.flix constant.character.escape.flix
+#            ^^^^^^^^^^^^^^^^^^^^^ source.flix string.quoted.double.flix
+#                                 ^ source.flix string.quoted.double.flix punctuation.definition.string.end.flix
+>    "value: ${x + 1}!"
+#^^^^ source.flix
+#    ^ source.flix string.quoted.double.flix punctuation.definition.string.begin.flix
+#     ^^^^^^^ source.flix string.quoted.double.flix
+#            ^ source.flix string.quoted.double.flix punctuation.definition.template-expression.begin.flix
+#             ^ source.flix string.quoted.double.flix punctuation.definition.template-expression.begin.flix
+#              ^^^^ source.flix string.quoted.double.flix meta.embedded.line.flix
+#                  ^ source.flix string.quoted.double.flix meta.embedded.line.flix constant.numeric.flix
+#                   ^ source.flix string.quoted.double.flix punctuation.definition.template-expression.end.flix
+#                    ^ source.flix string.quoted.double.flix
+#                     ^ source.flix string.quoted.double.flix punctuation.definition.string.end.flix
+>    "nested ${ {40 + 2} } block"
+#^^^^ source.flix
+#    ^ source.flix string.quoted.double.flix punctuation.definition.string.begin.flix
+#     ^^^^^^^ source.flix string.quoted.double.flix
+#            ^ source.flix string.quoted.double.flix punctuation.definition.template-expression.begin.flix
+#             ^ source.flix string.quoted.double.flix punctuation.definition.template-expression.begin.flix
+#              ^ source.flix string.quoted.double.flix meta.embedded.line.flix
+#               ^ source.flix string.quoted.double.flix meta.embedded.line.flix
+#                ^^ source.flix string.quoted.double.flix meta.embedded.line.flix constant.numeric.flix
+#                  ^^^ source.flix string.quoted.double.flix meta.embedded.line.flix
+#                     ^ source.flix string.quoted.double.flix meta.embedded.line.flix constant.numeric.flix
+#                      ^ source.flix string.quoted.double.flix meta.embedded.line.flix
+#                       ^ source.flix string.quoted.double.flix meta.embedded.line.flix
+#                        ^ source.flix string.quoted.double.flix punctuation.definition.template-expression.end.flix
+#                         ^^^^^^ source.flix string.quoted.double.flix
+#                               ^ source.flix string.quoted.double.flix punctuation.definition.string.end.flix
+>    "escaped \${not interpolation}"
+#^^^^ source.flix
+#    ^ source.flix string.quoted.double.flix punctuation.definition.string.begin.flix
+#     ^^^^^^^^ source.flix string.quoted.double.flix
+#             ^^ source.flix string.quoted.double.flix constant.character.escape.flix
+#               ^^^^^^^^^^^^^^^^^^^ source.flix string.quoted.double.flix
+#                                  ^ source.flix string.quoted.double.flix punctuation.definition.string.end.flix
+>    d"debug ${x}"
+#^^^^ source.flix
+#    ^ source.flix string.quoted.double.flix keyword.other.debug.flix
+#     ^ source.flix string.quoted.double.flix punctuation.definition.string.begin.flix
+#      ^^^^^^ source.flix string.quoted.double.flix
+#            ^ source.flix string.quoted.double.flix punctuation.definition.template-expression.begin.flix
+#             ^ source.flix string.quoted.double.flix punctuation.definition.template-expression.begin.flix
+#              ^ source.flix string.quoted.double.flix meta.embedded.line.flix
+#               ^ source.flix string.quoted.double.flix punctuation.definition.template-expression.end.flix
+#                ^ source.flix string.quoted.double.flix punctuation.definition.string.end.flix
+>    regex"a*b\\p{Blank}+"
+#^^^^ source.flix
+#    ^^^^^ source.flix string.regexp.flix keyword.other.regexp.flix
+#         ^ source.flix string.regexp.flix punctuation.definition.string.begin.flix
+#          ^^^ source.flix string.regexp.flix
+#             ^^ source.flix string.regexp.flix constant.character.escape.flix
+#               ^^^^^^^^^ source.flix string.regexp.flix
+#                        ^ source.flix string.regexp.flix punctuation.definition.string.end.flix
+>    'a'
+#^^^^ source.flix
+#    ^ source.flix string.quoted.single.flix punctuation.definition.string.begin.flix
+#     ^ source.flix string.quoted.single.flix
+#      ^ source.flix string.quoted.single.flix punctuation.definition.string.end.flix
+>    'ÿ'
+#^^^^ source.flix
+#    ^ source.flix string.quoted.single.flix punctuation.definition.string.begin.flix
+#     ^ source.flix string.quoted.single.flix
+#      ^ source.flix string.quoted.single.flix punctuation.definition.string.end.flix
+>    %%ARRAY_LOAD%%
+#^^^^ source.flix
+#    ^^ source.flix support.function.builtin.flix punctuation.definition.builtin.begin.flix
+#      ^^^^^^^^^^ source.flix support.function.builtin.flix
+#                ^^ source.flix support.function.builtin.flix punctuation.definition.builtin.end.flix
+>    ???
+#^^^^ source.flix
+#    ^^^ source.flix constant.language.hole.flix
+>    ?namedHole
+#^^^^ source.flix
+#    ^^^^^^^^^^ source.flix constant.language.hole.flix
+>    varHole?
+#^^^^ source.flix
+#    ^^^^^^^^ source.flix constant.language.hole.flix
+>

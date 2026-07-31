@@ -218,6 +218,196 @@ const keywords: Record<string, Rule> = {
 };
 
 /**
+ * Digit group, from the grammar `Lexer.acceptNumber` documents:
+ * `\D = [0-9]+(_[0-9]+)*`.
+ *
+ * Note the single underscore *between* groups. The incumbent grammar writes
+ * `[0-9](_*[0-9])*`, which also accepts `1__2`.
+ */
+const DIGITS = '[0-9]+(?:_[0-9]+)*';
+
+/** Suffixes accepted on an integer literal, from `Lexer.acceptHexNumber`. */
+const INT_SUFFIX = '(?:i8|i16|i32|i64|ii)';
+
+/** Every numeric suffix, from the `TokenKind.Literal*` set. */
+const NUMBER_SUFFIX = '(?:i8|i16|i32|i64|ii|f32|f64|ff)';
+
+/**
+ * Characters that continue a number, from `Lexer.isNumberLikeChar`: a digit, a letter,
+ * `.`, or `_`. The lexer treats any of them following a literal as part of the same
+ * (erroneous) token, so a valid literal must not be followed by one.
+ *
+ * Consequence: `32q` matches no rule and stays unscoped, which is the honest rendering —
+ * the lexer does not produce a number there either. The grammar deliberately does not
+ * assign `invalid.illegal`, because a false positive would paint valid code red, and
+ * TextMate has no way to confirm the lexer's judgement.
+ */
+const NUMBER_BOUNDARY = '(?![0-9A-Za-z_.])';
+
+/** A literal may not begin partway through a name or another number. */
+const NUMBER_START = '(?<![0-9A-Za-z_$!.])';
+
+/**
+ * Literal rules.
+ *
+ * Ordering inside `#literals` is load-bearing. `0x1F` is matched at offset 0 by both the
+ * hex and the decimal rule; TextMate breaks the tie by array order, so hex must come
+ * first. The incumbent grammar has them the other way round, which is defect #1.
+ */
+const literals: Record<string, Rule> = {
+  literals: {
+    patterns: [
+      { include: '#regex-literal' },
+      { include: '#debug-string' },
+      { include: '#string' },
+      { include: '#char' },
+      { include: '#builtin' },
+      { include: '#number-hex' },
+      { include: '#number' },
+      { include: '#holes' },
+    ],
+  },
+
+  'string-escape': {
+    comment:
+      '`Lexer.consumeSingleEscapes` accepts a backslash followed by any character; ' +
+      '`\\uXXXX` is kept whole because that is the unit the weeder decodes.',
+    match: '\\\\(?:u[0-9a-fA-F]{4}|.)',
+    name: 'constant.character.escape.flix',
+  },
+
+  string: {
+    comment:
+      'Single-line: `Lexer.acceptString` returns UnterminatedString on `\\n`, so the ' +
+      'end pattern is line-anchored rather than running to the next quote in the file.',
+    name: 'string.quoted.double.flix',
+    begin: '"',
+    beginCaptures: { '0': { name: 'punctuation.definition.string.begin.flix' } },
+    end: '"|$',
+    endCaptures: { '0': { name: 'punctuation.definition.string.end.flix' } },
+    patterns: [{ include: '#string-escape' }, { include: '#string-interpolation' }],
+  },
+
+  'debug-string': {
+    comment:
+      '`d"..."` is TokenKind.DebugInterpolator; see the dispatch in Lexer.scanToken.',
+    name: 'string.quoted.double.flix',
+    begin: '(?<![A-Za-z0-9_!$])(d)(")',
+    beginCaptures: {
+      '1': { name: 'keyword.other.debug.flix' },
+      '2': { name: 'punctuation.definition.string.begin.flix' },
+    },
+    end: '"|$',
+    endCaptures: { '0': { name: 'punctuation.definition.string.end.flix' } },
+    patterns: [{ include: '#string-escape' }, { include: '#string-interpolation' }],
+  },
+
+  'string-interpolation': {
+    comment:
+      'The escape rule is listed before this one in #string, so `\\${` stays a literal — ' +
+      'matching Lexer.acceptString, which requires the `$` to be unescaped.',
+    begin: '(\\$)(\\{)',
+    beginCaptures: {
+      '1': { name: 'punctuation.definition.template-expression.begin.flix' },
+      '2': { name: 'punctuation.definition.template-expression.begin.flix' },
+    },
+    end: '\\}|$',
+    endCaptures: { '0': { name: 'punctuation.definition.template-expression.end.flix' } },
+    contentName: 'meta.embedded.line.flix',
+    patterns: [{ include: '#interpolation-block' }, { include: '$self' }],
+  },
+
+  'interpolation-block': {
+    comment:
+      'A braced block inside an interpolation, so the interpolation is not closed by the ' +
+      'inner brace of `"${ {40 + 2} }"`. Mirrors the blockNestingLevel counter in ' +
+      'Lexer.acceptStringInterpolation.',
+    begin: '\\{',
+    end: '\\}|$',
+    patterns: [{ include: '#interpolation-block' }, { include: '$self' }],
+  },
+
+  'regex-literal': {
+    comment:
+      '`regex"..."` is TokenKind.LiteralRegex. No interpolation: Lexer.acceptRegex only ' +
+      'consumes escapes and looks for the closing quote.',
+    name: 'string.regexp.flix',
+    begin: '(?<![A-Za-z0-9_!$])(regex)(")',
+    beginCaptures: {
+      '1': { name: 'keyword.other.regexp.flix' },
+      '2': { name: 'punctuation.definition.string.begin.flix' },
+    },
+    end: '"|$',
+    endCaptures: { '0': { name: 'punctuation.definition.string.end.flix' } },
+    patterns: [{ include: '#string-escape' }],
+  },
+
+  char: {
+    comment:
+      'Line-anchored by choice, not by the lexer: Lexer.acceptChar has no newline check, ' +
+      'so a char literal may technically span lines. Honouring that would let one stray ' +
+      "apostrophe paint the rest of the file — the incumbent grammar's defect #10 — for a " +
+      'construct that does not occur in practice.',
+    name: 'string.quoted.single.flix',
+    begin: "'",
+    beginCaptures: { '0': { name: 'punctuation.definition.string.begin.flix' } },
+    end: "'|$",
+    endCaptures: { '0': { name: 'punctuation.definition.string.end.flix' } },
+    patterns: [{ include: '#string-escape' }],
+  },
+
+  builtin: {
+    comment:
+      '`%%ARRAY_LOAD%%` is TokenKind.BuiltIn. Lexer.isBuiltInChar is an uppercase letter, ' +
+      'a digit, or an underscore.',
+    match: '(%%)([A-Z0-9_]+)(%%)',
+    name: 'support.function.builtin.flix',
+    captures: {
+      '1': { name: 'punctuation.definition.builtin.begin.flix' },
+      '3': { name: 'punctuation.definition.builtin.end.flix' },
+    },
+  },
+
+  'number-hex': {
+    comment: 'Must precede #number: both match at offset 0 of `0x1F`. See defect #1.',
+    match: `${NUMBER_START}0x[0-9a-fA-F]+(?:_[0-9a-fA-F]+)*${INT_SUFFIX}?${NUMBER_BOUNDARY}`,
+    name: 'constant.numeric.hex.flix',
+  },
+
+  number: {
+    comment:
+      'The grammar documented on Lexer.acceptNumber: ' +
+      '\\D([.]\\D)?(e([+]|[-])?\\D([.]\\D)?)?(i8|i16|i32|i64|ii|f32|f64|ff)?',
+    match:
+      `${NUMBER_START}${DIGITS}(?:\\.${DIGITS})?` +
+      `(?:e[+-]?${DIGITS}(?:\\.${DIGITS})?)?${NUMBER_SUFFIX}?${NUMBER_BOUNDARY}`,
+    name: 'constant.numeric.flix',
+  },
+
+  holes: {
+    patterns: [
+      {
+        comment: '`???` is TokenKind.HoleAnonymous, one of Lexer.SimpleTokens.',
+        match: '\\?\\?\\?',
+        name: 'constant.language.hole.flix',
+      },
+      {
+        comment: '`?name` is TokenKind.HoleNamed; see Lexer.acceptNamedHole.',
+        match: '\\?[A-Za-z][A-Za-z0-9_!$]*',
+        name: 'constant.language.hole.flix',
+      },
+      {
+        comment:
+          '`name?` is TokenKind.HoleVariable; Lexer.acceptName returns it when a name is ' +
+          'followed by `?`.',
+        match: '[A-Za-z][A-Za-z0-9_!$]*\\?',
+        name: 'constant.language.hole.flix',
+      },
+    ],
+  },
+};
+
+/**
  * Comment rules.
  *
  * `Lexer.acceptLineOrDocComment` counts the slashes after the leading `//`: exactly one
@@ -284,11 +474,13 @@ export const flixTmLanguage: TmLanguage = {
   // Comments first: a `begin`/`end` rule that opens inside a comment would never close.
   patterns: [
     { include: '#comments' },
+    { include: '#literals' },
     { include: '#annotations' },
     { include: '#keywords' },
   ],
   repository: {
     ...comments,
+    ...literals,
     ...annotations,
     ...keywords,
   },
