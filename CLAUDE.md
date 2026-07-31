@@ -88,6 +88,11 @@ keywords that are not in `Lexer.Keywords` (`dbg`, `typematch`, `resume`, `branch
   a rule still open. Ratchet: coverage may not fall below `tests/corpus-baseline.json`.
   Coverage is **not** a target — raising it by guessing at expression-position identifiers is
   precisely what this grammar refuses to do.
+- `scripts/check-token-boundaries.mjs` — differential against `tree-sitter-flix`. The only
+  gate with an independent oracle: every other one answers "does a scope exist", never "is
+  it on the right characters". Compares token boundaries, never scope names. When it fires,
+  suspect the grammar before suspecting the check — it found three real defects on its first
+  two runs, including one the 890-file corpus audit and five test suites all missed.
 - `scripts/generate-scope-mapping.mjs` — emits `docs/SCOPE-MAPPING.md`. Both inventories are
   read mechanically, so a scope or capture added on either side surfaces as unmapped.
 

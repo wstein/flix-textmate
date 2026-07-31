@@ -337,7 +337,7 @@
     },
     "declaration-function": {
       "comment": "A definition may be named by a user-defined operator, e.g. `def >>`.",
-      "match": "(?<![A-Za-z0-9_!$])(def|redef|law)(?![A-Za-z0-9_!$])\\s+((?:[a-z_][A-Za-z0-9_!$]*|[A-Z][A-Za-z0-9_!$]*|[\\x{2200}-\\x{22FF}]+|[+\\-*<>=!&|^$]+))",
+      "match": "(?<![A-Za-z0-9_!$])(def|redef|law)(?![A-Za-z0-9_!$])\\s+((?:\\$[A-Za-z][A-Za-z0-9_!$]*|_?[\\x{2200}-\\x{22FF}]+|_?[+\\-*<>=!&|^$]+|[a-z_][A-Za-z0-9_!$]*|[A-Z][A-Za-z0-9_!$]*))",
       "captures": {
         "1": {
           "name": "storage.type.flix"
@@ -466,7 +466,8 @@
       "name": "support.type.primitive.flix"
     },
     "math-name": {
-      "match": "[\\x{2200}-\\x{22FF}]+",
+      "comment": "A leading `_` belongs to the token: Lexer.scanToken routes `_` followed by a math character into acceptMathName. The lookbehind keeps the `_` of `x_` out of it.",
+      "match": "(?<![A-Za-z0-9_!$])_?[\\x{2200}-\\x{22FF}]+",
       "name": "variable.other.math.flix"
     },
     "escaped-name": {
@@ -593,7 +594,7 @@
     },
     "operator": {
       "comment": "Flix admits user-defined operators, so this is a character class rather than an enumeration of Lexer.Operators. The named entries are a subset of what this matches.",
-      "match": "(?:(?<![A-Za-z0-9_!$])[+\\-*<>=!&|^$]|[+\\-*<>=&|^])[+\\-*<>=!&|^$]*",
+      "match": "(?:(?<![A-Za-z0-9_!$])_?[+\\-*<>=!&|^$]|[+\\-*<>=&|^])[+\\-*<>=!&|^$]*",
       "name": "keyword.operator.flix"
     },
     "operator-misc": {

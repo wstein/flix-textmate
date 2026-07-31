@@ -43,7 +43,8 @@
     "audit": "node scripts/audit-corpus.mjs",
     "docs:mapping": "node scripts/generate-scope-mapping.mjs",
     "check:lexicon": "node scripts/extract-lexicon.mjs && git diff --exit-code -- src/typescript/lexicon.generated.ts",
-    "check:scopes": "node scripts/check-scopes-documented.mjs"
+    "check:scopes": "node scripts/check-scopes-documented.mjs",
+    "check:boundaries": "node scripts/check-token-boundaries.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

@@ -114,3 +114,19 @@
 
     _x?
 //  ^^^ constant.language.hole.flix
+
+// --- Lexer.scanToken's `_` case peeks at the next character and routes into acceptName,
+// acceptMathName, or acceptUserDefinedOp, so a leading underscore belongs to the token.
+// Found by scripts/check-token-boundaries.mjs against tree-sitter-flix.
+
+    def _>==>(x: a): a = x
+//      ^^^^^ entity.name.function.flix
+
+    let _⊆ = 1
+//      ^^ variable.other.math.flix
+
+// --- `$name` is an escaped name (Lexer.acceptEscapedName). A definition may be named by
+// one; Java interop overrides such as `$run` rely on it.
+
+    def $run(): Unit = ()
+//      ^^^^ entity.name.function.flix

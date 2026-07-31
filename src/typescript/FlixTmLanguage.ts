@@ -500,7 +500,7 @@ const USER_OP = '[+\\-*<>=!&|^$]+';
  * `TokenKind.Dollar`. So an operator run may begin with `!` or `$` only when it does not
  * continue a name; the other operator characters are unambiguous.
  */
-const USER_OP_START = `(?:(?<!${NAME_CHAR})[+\\-*<>=!&|^$]|[+\\-*<>=&|^])[+\\-*<>=!&|^$]*`;
+const USER_OP_START = `(?:(?<!${NAME_CHAR})_?[+\\-*<>=!&|^$]|[+\\-*<>=&|^])[+\\-*<>=!&|^$]*`;
 
 /**
  * Guard for a *fixed* operator spelling: the lexer accepts one only when no further
@@ -515,8 +515,33 @@ const USER_OP_START = `(?:(?<!${NAME_CHAR})[+\\-*<>=!&|^$]|[+\\-*<>=&|^])[+\\-*<
  */
 const NOT_USER_OP_NEXT = '(?![+\\-*<>=!&|^$])';
 
-/** Any name that may follow `def`, including operator and math spellings. */
-const DEFINITION_NAME = `(?:${LOWER_NAME}|${UPPER_NAME}|${MATH_NAME}|${USER_OP})`;
+/**
+ * A math name or user-defined operator may carry a leading underscore.
+ *
+ * `Lexer.scanToken`'s `_` case peeks at the next character and routes into `acceptName`,
+ * `acceptMathName`, or `acceptUserDefinedOp` accordingly — so `_\u221a` is one math name and
+ * `_>==>` one operator, both of which appear in Flix's own test suite. Without the optional
+ * `_` the underscore is scoped separately and the token is painted in two pieces.
+ */
+const MATH_TOKEN = `_?${MATH_NAME}`;
+const USER_OP_TOKEN = `_?${USER_OP}`;
+
+/**
+ * An escaped name, from `Lexer.acceptEscapedName`: `$` followed by a name.
+ *
+ * `$` is both a name character and a user-operator character, so a definition named
+ * `$run` (Java interop overrides use this) must be matched as one name. Listing
+ * {@link USER_OP} first in {@link DEFINITION_NAME} would match only the `$`.
+ */
+const ESCAPED_NAME = `\\$[A-Za-z]${NAME_CHAR}*`;
+
+/**
+ * Any name that may follow `def`, including escaped, operator, and math spellings.
+ *
+ * Order is load-bearing: Oniguruma alternation returns the first match, not the longest,
+ * so the escaped form must precede `USER_OP`, whose character class also contains `$`.
+ */
+const DEFINITION_NAME = `(?:${ESCAPED_NAME}|${MATH_TOKEN}|${USER_OP_TOKEN}|${LOWER_NAME}|${UPPER_NAME})`;
 
 /**
  * Declaration rules.
@@ -601,7 +626,10 @@ const names: Record<string, Rule> = {
   },
 
   'math-name': {
-    match: MATH_NAME,
+    comment:
+      'A leading `_` belongs to the token: Lexer.scanToken routes `_` followed by a math ' +
+      'character into acceptMathName. The lookbehind keeps the `_` of `x_` out of it.',
+    match: `(?<!${NAME_CHAR})${MATH_TOKEN}`,
     name: 'variable.other.math.flix',
   },
 

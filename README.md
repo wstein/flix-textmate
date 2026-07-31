@@ -60,8 +60,16 @@ Against a Flix source tree (not vendored, so CI does not run these):
 
 ```bash
 npm run audit -- --corpus ~/github.com/wstein/flix-fork
+npm run check:boundaries -- --corpus ~/github.com/wstein/flix-fork
 npm run docs:mapping -- --tree-sitter ~/github.com/wstein/tree-sitter-flix
 ```
+
+`check:boundaries` is the only gate with an **independent oracle**. It parses the corpus
+with [`tree-sitter-flix`](https://github.com/wstein/tree-sitter-flix) and asserts that no
+scoped TextMate token covers a strict sub-range of an atomic tree-sitter token — comparing
+token _boundaries_, never scope names, since the two taxonomies deliberately differ. Every
+other gate answers "does a scope exist"; only this one can answer "is it on the right
+characters".
 
 `audit` enforces two things: no file may end with a rule still open (a hard gate — currently
 zero across 890 files), and scope coverage may not fall below `tests/corpus-baseline.json`.
