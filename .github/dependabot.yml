@@ -1,0 +1,32 @@
+version: 2
+
+updates:
+  # Everything here is a devDependency — the published artifact is a single JSON file
+  # with no runtime dependencies — so a bad bump breaks CI, never a consumer. Grouping
+  # is therefore safe and keeps the PR count low.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      dev-dependencies:
+        patterns: ['*']
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: ci
+      include: scope
+    groups:
+      actions:
+        patterns: ['*']

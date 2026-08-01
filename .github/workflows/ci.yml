@@ -5,6 +5,12 @@ on:
     branches: [main]
   pull_request:
 
+# Every gate here only reads the checkout. Dependabot opens pull requests that run this
+# workflow with third-party code already in the tree, so the token it runs under should
+# not be able to write anything.
+permissions:
+  contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
