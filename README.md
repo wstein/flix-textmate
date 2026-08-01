@@ -1,5 +1,12 @@
 # flix-textmate
 
+[![CI](https://github.com/wstein/flix-textmate/actions/workflows/ci.yml/badge.svg)](https://github.com/wstein/flix-textmate/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE.md)
+[![Node](https://img.shields.io/badge/node-%E2%89%A5%2022.18-5FA04E.svg?logo=node.js&logoColor=white)](package.json)
+[![Scopes](https://img.shields.io/badge/scopes-64-blue.svg)](docs/SCOPES.md)
+[![Corpus coverage](https://img.shields.io/badge/corpus%20coverage-66.32%25-blue.svg)](tests/corpus-baseline.json)
+[![Grammar](https://img.shields.io/badge/scopeName-source.flix-blue.svg)](syntaxes/flix.tmLanguage.json)
+
 A TextMate grammar for the [Flix](https://flix.dev) programming language, authored in
 TypeScript and emitted as `syntaxes/flix.tmLanguage.json`.
 
@@ -18,6 +25,45 @@ Flix has two independent highlighting paths, and neither covers the TextMate sur
 This project is a drop-in replacement for the latter: same file name, same `scopeName`,
 same non-standard `copyright_notice` / `license` keys, so the emitted JSON can be
 contributed upstream unchanged.
+
+## Using the grammar
+
+The artifact is the single file [`syntaxes/flix.tmLanguage.json`](syntaxes/flix.tmLanguage.json).
+It has no runtime dependencies and is not published to npm, so vendor it from a tag:
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/wstein/flix-textmate/v0.1.1/syntaxes/flix.tmLanguage.json
+```
+
+A VS Code extension contributes it against the `flix` language identifier:
+
+```json
+{
+  "contributes": {
+    "grammars": [
+      {
+        "language": "flix",
+        "scopeName": "source.flix",
+        "path": "./syntaxes/flix.tmLanguage.json"
+      }
+    ]
+  }
+}
+```
+
+[Shiki](https://shiki.style) — and anything else built on `vscode-textmate`, the engine this
+repository's own tests tokenize with — takes it as a language:
+
+```js
+import { createHighlighter } from 'shiki';
+import flix from './flix.tmLanguage.json' with { type: 'json' };
+
+const highlighter = await createHighlighter({ langs: [flix], themes: ['github-dark'] });
+highlighter.codeToHtml(source, { lang: 'flix', theme: 'github-dark' });
+```
+
+Every scope the grammar can emit is enumerated in [`docs/SCOPES.md`](docs/SCOPES.md). The
+taxonomy is the mainstream VS Code one, so a stock theme needs no configuration.
 
 ## Source of truth
 
@@ -41,7 +87,7 @@ stable in a file that does not yet compile.
 ```bash
 npm install
 npm run build        # TypeScript -> syntaxes/flix.tmLanguage.json
-npm run verify       # typecheck + lint + build-is-current + unit + snapshot tests
+npm run verify       # typecheck + lint + build-is-current + unit + unscoped + snapshot
 ```
 
 Individual steps:
@@ -83,7 +129,7 @@ characters".
 zero across 890 files), and scope coverage may not fall below `tests/corpus-baseline.json`.
 Coverage is a **ratchet, not a target**: this grammar deliberately leaves expression-position
 identifiers bare, so chasing the number would mean inventing the heuristics it refuses to
-ship.
+ship. That is also why the coverage badge above is a fact, not a goal.
 
 Keywords, operators, and annotation names are not written by hand. They are extracted from
 the compiler into `src/typescript/lexicon.generated.ts`, which is committed so CI needs no
@@ -120,6 +166,19 @@ Two complementary suites:
 
 Fixture lines are indented by four spaces so an assertion line's own `//` prefix does not
 overlap the columns it points at.
+
+## Contributing
+
+Run `npm run fmt && npm run verify` before every commit, and `npm run audit` after any rule
+change — commit the refreshed `tests/corpus-baseline.json` alongside it. Commits follow
+[Conventional Commits](https://www.conventionalcommits.org); every defect fixed gets a unit
+test that fails before the fix. Adding a scope means documenting it in `docs/SCOPES.md` in
+the same change — `npm run check:scopes` enforces that, because requiring it in prose is
+what let the incumbent grammar drift.
+
+Dependency and workflow updates arrive as grouped weekly Dependabot pull requests
+([`.github/dependabot.yml`](.github/dependabot.yml)), and run the same CI gates as any
+other pull request.
 
 ## Documentation
 
