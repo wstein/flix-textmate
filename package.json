@@ -49,10 +49,10 @@
     "check:boundaries": "node scripts/check-token-boundaries.mjs"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
+    "@eslint/js": "^10.0.1",
     "@types/node": "^22.10.2",
     "ajv": "^8.17.1",
-    "eslint": "^9.39.1",
+    "eslint": "^10.8.0",
     "npm-run-all2": "^8.0.4",
     "prettier": "^3.4.2",
     "typescript": "^5.7.2",
