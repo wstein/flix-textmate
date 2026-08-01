@@ -14,7 +14,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['scripts/**/*.mjs', 'eslint.config.js'],
+    files: ['scripts/**/*.mjs', 'tests/scripts/**/*.mjs', 'eslint.config.js'],
     ...tseslint.configs.disableTypeChecked,
     languageOptions: { globals: { console: 'readonly', process: 'readonly' } },
   },

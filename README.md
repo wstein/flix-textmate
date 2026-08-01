@@ -87,18 +87,21 @@ stable in a file that does not yet compile.
 ```bash
 npm install
 npm run build        # TypeScript -> syntaxes/flix.tmLanguage.json
-npm run verify       # typecheck + lint + build-is-current + unit + unscoped + snapshot
+npm run verify       # typecheck + lint + build-is-current + every test suite
 ```
 
 Individual steps:
 
 ```bash
 npm run typecheck    # tsc --noEmit
-npm run lint         # eslint, the structural grammar lint, then the scope-doc check
+npm run lint         # eslint, the structural grammar lint, then the doc checks
 npm run fmt          # prettier --write, then eslint --fix
 npm run check:build  # rebuild and fail if the committed JSON changed
+npm run check:scopes # fail if the grammar emits a scope docs/SCOPES.md omits
+npm run check:badges # fail if a README badge misstates its source file
 npm run test:unit    # inline scope assertions, tests/unit/**
 npm run test:unscoped # identifiers that must receive no scope at all
+npm run test:scripts # unit tests for the check scripts, tests/scripts/**
 npm run test:snap    # full-tokenization snapshots, tests/snap/**
 npm run update:snap  # rewrite snapshots (review the diff!)
 ```
@@ -155,7 +158,7 @@ grammar edit that is not rebuilt fails the build rather than shipping stale JSON
 
 ### Writing tests
 
-Two complementary suites:
+Three suites, each answering a different question:
 
 - `tests/unit/*.test.flix` — intent. Each file opens with `// SYNTAX TEST "source.flix"`
   and asserts scopes with caret lines. These encode _why_ a rule exists; most of them are
@@ -163,9 +166,16 @@ Two complementary suites:
 - `tests/snap/*.test.flix` — ground truth. `npm run update:snap` records the complete
   tokenization, which is also the fastest way to discover the exact column of a token when
   writing a unit assertion.
+- `tests/scripts/*.test.mjs` — the gates themselves, run under `node --test`. A gate that
+  cannot fail is indistinguishable from no gate, so anything in `scripts/` that decides
+  pass or fail gets its failure modes exercised here.
 
 Fixture lines are indented by four spaces so an assertion line's own `//` prefix does not
 overlap the columns it points at.
+
+A negative assertion needs care: `vscode-tmgrammar-test` compares scopes by exact string
+equality, so `- keyword` passes against `keyword.control.flix` and proves nothing. Cases of
+the form "this must _not_ be highlighted" belong in `scripts/check-unscoped.mjs`.
 
 ## Contributing
 
@@ -174,7 +184,9 @@ change — commit the refreshed `tests/corpus-baseline.json` alongside it. Commi
 [Conventional Commits](https://www.conventionalcommits.org); every defect fixed gets a unit
 test that fails before the fix. Adding a scope means documenting it in `docs/SCOPES.md` in
 the same change — `npm run check:scopes` enforces that, because requiring it in prose is
-what let the incumbent grammar drift.
+what let the incumbent grammar drift. For the same reason `npm run check:badges` re-derives
+the numeric badges above from `package.json` and `tests/corpus-baseline.json`, so a stale
+one fails the build instead of misinforming the landing page.
 
 Dependency and workflow updates arrive as grouped weekly Dependabot pull requests
 ([`.github/dependabot.yml`](.github/dependabot.yml)), and run the same CI gates as any

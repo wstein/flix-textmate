@@ -18,11 +18,12 @@ only highlighting available on github.com, in Shiki-rendered docs, and before th
 
 ```bash
 npm run build        # TypeScript -> syntaxes/flix.tmLanguage.json
-npm run verify       # typecheck + lint + check:build + test:unit + test:snap
+npm run verify       # typecheck + lint + check:build + every test suite
 npm run check:build  # rebuild and fail if the committed JSON changed
 npm run fmt          # prettier --write, then eslint --fix
 npm run test:unit    # inline scope assertions
 npm run test:unscoped # identifiers that must receive no scope at all
+npm run test:scripts # node --test over tests/scripts/, the gates' own tests
 npm run test:snap    # full-tokenization snapshots
 npm run update:snap  # rewrite snapshots (review the diff!)
 
@@ -99,6 +100,14 @@ keywords that are not in `Lexer.Keywords` (`dbg`, `typematch`, `resume`, `branch
   two runs, including one the 890-file corpus audit and five test suites all missed.
 - `scripts/generate-scope-mapping.mjs` — emits `docs/SCOPE-MAPPING.md`. Both inventories are
   read mechanically, so a scope or capture added on either side surfaces as unmapped.
+- `scripts/check-badges.mjs` — re-derives the README's numeric badges from `package.json`
+  and `tests/corpus-baseline.json`. A Shields static badge hardcodes its value, so the
+  scope count and coverage percentage on the landing page are prose restating a committed
+  fact — the same drift `check-scopes-documented.mjs` prevents, one file further out. Only
+  badges with a value in a committed file belong there; the CI badge is rendered live.
+- `tests/scripts/*.test.mjs` — `node --test` unit tests for the gates above. A gate that
+  cannot fail is indistinguishable from no gate, so a check script's failure modes are
+  exercised directly rather than assumed. Adding a gate means adding its tests here.
 
 ### Grammar conventions
 
@@ -140,9 +149,14 @@ Nested block comments and interpolated strings _are_ expressible — via self-in
 
 - Conventional Commits; the type reflects the primary purpose of the change (`feat` for new
   scope coverage, `fix` for tokenization corrections, `chore`/`ci` for tooling).
-- Fixture lines in `tests/` are indented four spaces so assertion `//` prefixes do not
-  overlap the columns they point at.
+- Fixture lines in `tests/unit` and `tests/snap` are indented four spaces so assertion `//`
+  prefixes do not overlap the columns they point at.
 - Every defect fixed gets a unit test that fails before the fix.
 - Scope names are a contract. Adding one is easy; removing one breaks every theme that keys
   on it. Document each in `docs/SCOPES.md` at the same time — `npm run check:scopes`
   enforces this, because requiring it in prose is what let it drift in the first place.
+- The README's scope-count and coverage badges restate `tests/corpus-baseline.json`, so a
+  changed baseline means changing them too. `npm run check:badges` fails the build if not.
+- Dependency and Actions updates arrive as grouped weekly Dependabot pull requests
+  (`.github/dependabot.yml`). The CI token is `contents: read`; keep it that way unless a
+  job genuinely needs to write.
