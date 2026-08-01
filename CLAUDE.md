@@ -159,4 +159,7 @@ Nested block comments and interpolated strings _are_ expressible — via self-in
   changed baseline means changing them too. `npm run check:badges` fails the build if not.
 - Dependency and Actions updates arrive as grouped weekly Dependabot pull requests
   (`.github/dependabot.yml`). The CI token is `contents: read`; keep it that way unless a
-  job genuinely needs to write.
+  job genuinely needs to write. Two constraints are encoded there rather than remembered:
+  the ESLint packages are peer-locked and so are grouped across every update type, and
+  majors of `typescript` (capped by typescript-eslint's peer range) and `@types/node`
+  (which tracks `engines.node`, not npm's latest) are ignored until that changes.

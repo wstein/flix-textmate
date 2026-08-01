@@ -13,7 +13,23 @@ updates:
     commit-message:
       prefix: chore
       include: scope
+    ignore:
+      # typescript-eslint@8 peer-requires typescript <6.1.0, so a TypeScript major
+      # cannot install here. Drop this entry once typescript-eslint ships a release
+      # whose typescript peer range covers the major on offer.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+      # @types/node describes a runtime, so it tracks engines.node rather than npm's
+      # latest. Typing against a newer major would let code that does not exist on the
+      # supported floor type-check. Raise both together, or neither.
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
     groups:
+      # Peer-locked to one another: @eslint/js@10 requires eslint@^10, and
+      # typescript-eslint pins its own scoped packages. Splitting them produces a pull
+      # request that cannot install, so they move as one — majors included.
+      eslint:
+        patterns: ['eslint', '@eslint/*', 'typescript-eslint', '@typescript-eslint/*']
       dev-dependencies:
         patterns: ['*']
         update-types: [minor, patch]
