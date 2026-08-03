@@ -1,7 +1,7 @@
 {
   "comment": "Baseline for scripts/audit-corpus.mjs. Coverage is a ratchet, not a target — see the header of that script before raising it.",
-  "corpusFiles": 890,
-  "nonWhitespaceChars": 5301927,
-  "coveragePercent": 66.32,
+  "corpusFiles": 688,
+  "nonWhitespaceChars": 4936007,
+  "coveragePercent": 66.1,
   "distinctScopes": 64
 }

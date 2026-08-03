@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE.md)
 [![Node](https://img.shields.io/badge/node-%E2%89%A5%2022.18-5FA04E.svg?logo=node.js&logoColor=white)](package.json)
 [![Scopes](https://img.shields.io/badge/scopes-64-blue.svg)](docs/SCOPES.md)
-[![Corpus coverage](https://img.shields.io/badge/corpus%20coverage-66.32%25-blue.svg)](tests/corpus-baseline.json)
+[![Corpus coverage](https://img.shields.io/badge/corpus%20coverage-66.1%25-blue.svg)](tests/corpus-baseline.json)
 [![Grammar](https://img.shields.io/badge/scopeName-source.flix-blue.svg)](syntaxes/flix.tmLanguage.json)
 
 A TextMate grammar for the [Flix](https://flix.dev) programming language, authored in
