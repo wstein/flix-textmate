@@ -115,11 +115,8 @@
     @DefaultHandler
 //  ^^^^^^^^^^^^^^^ storage.type.annotation.flix
 
-    @LoweringTargetDatalog
-//  ^^^^^^^^^^^^^^^^^^^^^^ storage.type.annotation.flix
-
-    @LoweringTargetChannel
-//  ^^^^^^^^^^^^^^^^^^^^^^ storage.type.annotation.flix
+    @LoweringTarget
+//  ^^^^^^^^^^^^^^^ storage.type.annotation.flix
 
     @NotYetInvented
 //  ^^^^^^^^^^^^^^^ storage.type.annotation.flix

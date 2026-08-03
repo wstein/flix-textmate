@@ -60,11 +60,12 @@ not type names followed by `#`.
 
 ## Annotations
 
-`Weeder2.visitAnnotation` (Weeder2.scala:608–635) is the authoritative table — 17 entries.
-The incumbent hardcodes nine `@`-literals.
+`Weeder2.visitAnnotation` (Weeder2.scala:608–635) is the authoritative table — 16 entries at
+`flix/flix` v0.75.1 (`318bb51`), the commit flix-spec pins. The incumbent hardcodes nine
+`@`-literals.
 
-**Missing (9):** `@CompileTest`, `@DefaultHandler`, `@DontInline`, `@Export`, `@Inline`,
-`@LoweringTargetDatalog`, `@LoweringTargetChannel`, `@Tailrec`, `@Terminates`
+**Missing (8):** `@CompileTest`, `@DefaultHandler`, `@DontInline`, `@Export`, `@Inline`,
+`@LoweringTarget`, `@Tailrec`, `@Terminates`
 
 **Declared but nonexistent (1):** `@Internal`
 
@@ -72,7 +73,7 @@ Enumerating annotation names in the grammar is the underlying mistake, not the s
 omissions. `Lexer.acceptAnnotation` consumes `@` followed by `isAnnotationChar`, and
 `isAnnotationChar` is `isLetter` — ASCII letters only, no digits and no underscore. A single
 rule matching `@` plus letters covers every annotation that exists or will exist, and the
-17-name table becomes test data rather than grammar.
+16-name table becomes test data rather than grammar.
 
 ## Scope hygiene
 
