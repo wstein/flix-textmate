@@ -44,6 +44,14 @@ jobs:
       - name: Lexicon manifest is unmodified
         run: git diff --exit-code -- src/typescript/lexicon.generated.ts
 
+      # The check above protects the lexicon against its own generator. This one asserts *which*
+      # Flix it was generated from: flix-textmate, flix-spec, tree-sitter-flix and
+      # flix-jetbrains-plugin are only comparable while they describe the same compiler, and a
+      # lexicon regenerated against a newer Flix would leave every gate here green while colouring
+      # syntax the shared fixtures do not describe. Needs no checkout -- flix-pin.json is vendored.
+      - name: Declared Flix pin matches the committed lexicon
+        run: npm run check:pin
+
       - name: Unit tests
         run: npm run test:unit
 

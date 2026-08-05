@@ -1,0 +1,12 @@
+{
+  "note": "HAND-MAINTAINED. The Flix this grammar's lexical inventory is derived from, and the one gate that ties this repository to the rest of the ecosystem. src/typescript/lexicon.generated.ts is scraped from a Flix checkout, and scripts/extract-lexicon.mjs stamps that checkout's commit into the file -- so `git diff --exit-code` already catches a regeneration against a different compiler. What it cannot catch is this repository drifting away from the Flix that wstein/flix-spec pins, at which point the two describe different compilers and neither says so. This file is that assertion, checked by scripts/check-flix-pin.mjs. It must be updated together with flix-spec's own pin.json, never independently; a bump here that flix-spec has not made means the grammar is coloured for syntax the shared fixtures do not describe.",
+  "upstream": {
+    "tag": "v0.75.1",
+    "commit": "318bb51a953c58a8785251a80fad8aea005f729f"
+  },
+  "flixSpec": {
+    "repository": "https://github.com/wstein/flix-spec",
+    "pinFile": "pin.json",
+    "note": "Read upstream.commit there; it must equal upstream.commit here."
+  }
+}
