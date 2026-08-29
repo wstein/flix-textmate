@@ -19,10 +19,6 @@
 //  ^^^ storage.type.flix
 //      ^^ entity.name.function.flix
 
-    law reflexivity: Bool
-//  ^^^ storage.type.flix
-//      ^^^^^^^^^^^ entity.name.function.flix
-
     enum Shape { case Circle }
 //  ^^^^ storage.type.flix
 //       ^^^^^ entity.name.type.flix

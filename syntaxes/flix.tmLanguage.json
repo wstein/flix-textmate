@@ -337,7 +337,7 @@
     },
     "declaration-function": {
       "comment": "A definition may be named by a user-defined operator, e.g. `def >>`.",
-      "match": "(?<![A-Za-z0-9_!$])(def|redef|law)(?![A-Za-z0-9_!$])\\s+((?:\\$[A-Za-z][A-Za-z0-9_!$]*|_?[\\x{2200}-\\x{22FF}]+|_?[+\\-*<>=!&|^$]+|[a-z_][A-Za-z0-9_!$]*|[A-Z][A-Za-z0-9_!$]*))",
+      "match": "(?<![A-Za-z0-9_!$])(def|redef)(?![A-Za-z0-9_!$])\\s+((?:\\$[A-Za-z][A-Za-z0-9_!$]*|_?[\\x{2200}-\\x{22FF}]+|_?[+\\-*<>=!&|^$]+|[a-z_][A-Za-z0-9_!$]*|[A-Z][A-Za-z0-9_!$]*))",
       "captures": {
         "1": {
           "name": "storage.type.flix"
@@ -431,11 +431,11 @@
           "name": "keyword.other.flix"
         },
         {
-          "match": "(?<![A-Za-z0-9_!$])(?:lawful|sealed|mut|pub)(?![A-Za-z0-9_!$])",
+          "match": "(?<![A-Za-z0-9_!$])(?:sealed|mut|pub)(?![A-Za-z0-9_!$])",
           "name": "storage.modifier.flix"
         },
         {
-          "match": "(?<![A-Za-z0-9_!$])(?:restrictable|instance|struct|alias|redef|trait|enum|type|def|eff|law|let|mod)(?![A-Za-z0-9_!$])",
+          "match": "(?<![A-Za-z0-9_!$])(?:restrictable|instance|struct|alias|redef|trait|enum|type|def|eff|let|mod)(?![A-Za-z0-9_!$])",
           "name": "storage.type.flix"
         },
         {

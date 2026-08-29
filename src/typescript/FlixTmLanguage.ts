@@ -104,7 +104,6 @@ const KEYWORD_SCOPES: Record<Keyword, ScopeName> = {
   trait: 'storage.type.flix',
   instance: 'storage.type.flix',
   eff: 'storage.type.flix',
-  law: 'storage.type.flix',
   type: 'storage.type.flix',
   alias: 'storage.type.flix',
   mod: 'storage.type.flix',
@@ -113,7 +112,6 @@ const KEYWORD_SCOPES: Record<Keyword, ScopeName> = {
 
   pub: 'storage.modifier.flix',
   sealed: 'storage.modifier.flix',
-  lawful: 'storage.modifier.flix',
   mut: 'storage.modifier.flix',
 
   if: 'keyword.control.conditional.flix',
@@ -566,8 +564,7 @@ const declarations: Record<string, Rule> = {
 
   'declaration-function': {
     comment: 'A definition may be named by a user-defined operator, e.g. `def >>`.',
-    match:
-      `(?<!${NAME_CHAR})(def|redef|law)(?!${NAME_CHAR})` + `\\s+(${DEFINITION_NAME})`,
+    match: `(?<!${NAME_CHAR})(def|redef)(?!${NAME_CHAR})` + `\\s+(${DEFINITION_NAME})`,
     captures: {
       '1': { name: 'storage.type.flix' },
       '2': { name: 'entity.name.function.flix' },
