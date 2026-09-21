@@ -50,11 +50,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^22.20.2",
+    "@types/node": "^22.20.3",
     "ajv": "^8.17.1",
     "eslint": "^10.8.1",
     "npm-run-all2": "^9.0.3",
-    "prettier": "^3.4.2",
+    "prettier": "^3.9.8",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.67.0",
     "vscode-tmgrammar-test": "^0.1.3"
