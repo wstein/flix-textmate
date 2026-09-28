@@ -131,6 +131,32 @@ Note this still would not catch the *re-partitioning* of `ColonColon`'s extensio
 catches the added name, which is the signal you need. The digest cannot see that an existing token
 now covers less than it did.
 
+### 2b. `ast/annotation.json` now exists, and it is the other half of that scrape
+
+`extract-lexicon.mjs:80` reads the annotation table straight out of
+`Weeder2.visitAnnotation` — it locates `private def visitAnnotation`, scans to the fallthrough case,
+and parses the names out of the Scala source. That is the same text scraping as (2), applied to a
+second vocabulary, and it breaks the same way: upstream reformats the match, the parse yields a
+different set, and nothing compares the result to anything.
+
+flix-spec now publishes those names as `ast/annotation.json`, reflected from the pinned jar and
+digest-pinned in `pin.json`. Read them from there and assert the digest, exactly as for
+`ast/tokenkind.json`.
+
+Two things worth knowing before you do:
+
+- **The grammar rule does not need them, and should stay generic.** `FlixTmLanguage.ts:206` matches
+  `(@)([A-Za-z]+)` deliberately, and the comment above it gives the right reason: enumerating names
+  is what left the incumbent grammar missing `@Tailrec`, `@Terminates` and six others while carrying
+  `@Internal`, which `Weeder2` does not accept. Keep that. The inventory is for provenance and for
+  checks, not for the match.
+- **The vocabulary is open, so never reject on it.** Java interop annotations lex identically —
+  `@TestJvmAnnotation` appears in the Flix corpus on a method of an anonymous JVM class — and
+  upstream models exactly that with `Annotation.Error(name, loc)`. flix-spec measures *coverage*
+  against this inventory and never validity, and so should you.
+
+For reference, the current vocabulary is 16 names; 13 of them occur in Flix's own 893-file corpus.
+
 ### 3. Fix or remove the inert CI step
 
 Either give CI a Flix checkout and run `npm run check:lexicon`, or delete the step. Leaving a gate
