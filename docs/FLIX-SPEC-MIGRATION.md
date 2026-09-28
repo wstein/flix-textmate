@@ -206,3 +206,40 @@ of the adoption commit.
 `flix-pin.json` — to `v0.77.0` / `4a5b60a31ac03bb762f68b554a0fc2b6f4d982b9`, together with (1).
 That is the *Flix* pin; the flix-spec checkout in CI is pinned separately, and §4 says to give it
 an explicit `ref:` — use the `v0.77.1` tag.
+
+## Two guards worth adding while you are here
+
+Neither is required by the release. Both close gaps this migration exposed.
+
+### Emit only diagnostics the lexer or `Parser2` would raise
+
+flix-spec's pipeline stops after `Parser2`: `ProjectionExtractor` collects
+`lexerErrors ++ parserErrors` and nothing else, and `docs/CONFORMANCE.md` calls `Weeder2` errors
+"out of scope by construction, not a gap".
+
+So `diagnostic_conformance` compares against a **parse-phase-only** set. A spaced `::` reported as
+`Malformed` is fine, because `Parser2` raises it. But every validation-level check you later write
+into the projection output — duplicate modifiers, arity rules, anything `Weeder2` would own — adds a
+diagnostic the canonical side does not have, and breaks `kind`/`line` agreement on exactly the
+negative fixtures the lane is there to measure.
+
+Tag each check with the phase that owns it: parse-phase diagnostics go into the projection,
+validation-only diagnostics go to your CLI and stay out of it.
+
+### Assert the vocabulary digests, not just the pin commit
+
+`law` and `lawful` stopped being keywords at Flix v0.75.2 and went stale here without anyone
+noticing, because a commit SHA moving tells you *that* the vocabulary changed, never *what*
+changed — and nothing compared the names.
+
+Record `treeKindDigest` and `tokenKindDigest` from `pin.json` alongside the pin you already track,
+and fail on a mismatch. It costs two fields and forces a review at the next vocabulary change
+instead of after it.
+
+Two cheap follow-ons, now that `ast/retired.json` exists:
+
+- assert that nothing in your keyword or token table matches a `Keyword*` entry in
+  `ast/retired.json` — that pins the `law`/`lawful` class of staleness as a regression test;
+- remember the digest cannot see an existing kind's *extension* being re-partitioned. It caught
+  `ColonColonTight` only because a **new name** appeared. When a name is added, ask what it took
+  from; the answer belongs in a fixture.
