@@ -116,6 +116,7 @@ if (shouldUpdate) {
         comment:
           'Baseline for scripts/audit-corpus.mjs. Coverage is a ratchet, not a target ' +
           '— see the header of that script before raising it.',
+        sourceRevision: FLIX_COMPILER.revision,
         corpusFiles: files.length,
         nonWhitespaceChars: totalChars,
         coveragePercent: coverage,

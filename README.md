@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE.md)
 [![Node](https://img.shields.io/badge/node-%E2%89%A5%2022.18-5FA04E.svg?logo=node.js&logoColor=white)](package.json)
 [![Scopes](https://img.shields.io/badge/scopes-64-blue.svg)](docs/SCOPES.md)
-[![Corpus coverage](https://img.shields.io/badge/corpus%20coverage-66.1%25-blue.svg)](tests/corpus-baseline.json)
+[![Corpus coverage](https://img.shields.io/badge/corpus%20coverage-65.79%25-blue.svg)](tests/corpus-baseline.json)
 [![Grammar](https://img.shields.io/badge/scopeName-source.flix-blue.svg)](syntaxes/flix.tmLanguage.json)
 
 A TextMate grammar for the [Flix](https://flix.dev) programming language, authored in
@@ -129,7 +129,7 @@ other gate answers "does a scope exist"; only this one can answer "is it on the 
 characters".
 
 `audit` enforces two things: no file may end with a rule still open (a hard gate — currently
-zero across 890 files), and scope coverage may not fall below `tests/corpus-baseline.json`.
+zero across 894 files), and scope coverage may not fall below `tests/corpus-baseline.json`.
 Coverage is a **ratchet, not a target**: this grammar deliberately leaves expression-position
 identifiers bare, so chasing the number would mean inventing the heuristics it refuses to
 ship. That is also why the coverage badge above is a fact, not a goal.
@@ -202,3 +202,26 @@ other pull request.
 
 Apache License 2.0. The grammar carries forward the copyright notice of the upstream
 `flix/textmate` grammar it replaces.
+
+### Flix 0.79 source baseline
+
+The lexical inventory and corpus checks require Flix v0.79.0 at
+`36d923ca325dc466b28c63419667e6026a80f920`. The boundary and scope-mapping
+oracle is tree-sitter-flix at `b120a7ad3072a3d17ac02ac8571e8f42a368aaad`
+([migration PR #11](https://github.com/wstein/tree-sitter-flix/pull/11));
+this pin does not imply that the PR has merged. External checks reject another HEAD.
+
+Flix 0.79 removes the keywords `law` and `lawful`. Neither those names nor a
+following name receive declaration scopes. Operators and primitive types are unchanged.
+The accepted annotation inventory removes `Export` and replaces `LoweringTarget` with
+`LoweringTargetChannel` and `LoweringTargetDatalog`. Annotation highlighting remains
+lexical: every `@` followed by ASCII letters is highlighted, including unknown names.
+
+The refreshed corpus contains 894 files, with 65.79% coverage and 64 scopes.
+Both the original grammar at `ead9878a26cae5b2568768eddbd6f5c0789ba69e` and
+the migrated grammar measure 65.79% on these same 5,218,078 non-whitespace
+characters, with zero files ending in an open rule.
+The previous 688-file baseline had no recorded source revision and cannot be compared as
+the same corpus. The former lexicon revision has 873 tracked Flix files; upstream adds
+35 and removes 14 by 0.79 (renames counted separately). Coverage is a measurement,
+not a syntax conformance claim or a target for expression-name heuristics.

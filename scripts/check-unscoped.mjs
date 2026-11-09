@@ -35,6 +35,14 @@ const MUST_BE_UNSCOPED = [
   { text: 'jumpto', why: 'not in Lexer.Keywords' },
   { text: 'without', why: 'not in Lexer.Keywords' },
   { text: 'opaque', why: 'not in Lexer.Keywords' },
+  // Removed from Lexer.Keywords in Flix 0.79.
+  { text: 'law', why: 'ordinary name since Flix 0.79' },
+  { text: 'lawful', why: 'ordinary name since Flix 0.79' },
+  {
+    text: 'law reflexivity: Bool',
+    subject: 'reflexivity',
+    why: 'law no longer introduces a declaration',
+  },
   // Names that merely start with, or extend, a keyword. Lexer.acceptIfKeyword rejects a
   // keyword when the next character is a name character (Lexer.isNameChar).
   { text: 'let!', why: '`!` is a name character, so this is one name' },

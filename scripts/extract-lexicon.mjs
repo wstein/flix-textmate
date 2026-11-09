@@ -136,7 +136,7 @@ function describeSource() {
   }
 
   try {
-    return `${origin} @ ${git(['rev-parse', '--short', 'HEAD'])}`;
+    return `${origin} @ ${git(['rev-parse', 'HEAD'])}`;
   } catch {
     return origin;
   }
