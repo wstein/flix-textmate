@@ -57,10 +57,7 @@
 #                                                     ^ source.flix punctuation.section.parens.flix
 #                                                      ^ source.flix punctuation.section.parens.flix
 >    law reflexivity: forall (x: a) . x == x
-#^^^^ source.flix
-#    ^^^ source.flix storage.type.flix
-#       ^ source.flix
-#        ^^^^^^^^^^^ source.flix entity.name.function.flix
+#^^^^^^^^^^^^^^^^^^^ source.flix
 #                   ^ source.flix punctuation.separator.colon.flix
 #                    ^ source.flix
 #                     ^^^^^^ source.flix keyword.other.flix

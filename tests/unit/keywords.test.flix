@@ -100,8 +100,11 @@
     @Terminates
 //  ^^^^^^^^^^^ storage.type.annotation.flix
 
-    @Export
-//  ^^^^^^^ storage.type.annotation.flix
+    @LoweringTargetChannel
+//  ^^^^^^^^^^^^^^^^^^^^^^ storage.type.annotation.flix
+
+    @LoweringTargetDatalog
+//  ^^^^^^^^^^^^^^^^^^^^^^ storage.type.annotation.flix
 
     @Inline
 //  ^^^^^^^ storage.type.annotation.flix

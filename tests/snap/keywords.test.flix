@@ -12,3 +12,6 @@
     @MustUseSomedayInvented
     Static Univ static
     let z = 1
+    law lawful
+    @LoweringTargetChannel @LoweringTargetDatalog
+    @Export @LoweringTarget

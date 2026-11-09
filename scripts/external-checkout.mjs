@@ -10,6 +10,7 @@
  * fails confusingly everywhere else, and it leaks whoever wrote it into the repository.
  */
 
+import { execFileSync } from 'node:child_process';
 import { statSync } from 'node:fs';
 
 /**
@@ -20,9 +21,17 @@ import { statSync } from 'node:fs';
  * @param {string} options.env         Environment variable, e.g. `FLIX_SOURCE`.
  * @param {string} options.what        Human description used in the error message.
  * @param {string} options.repository  Upstream URL, so the message says where to get it.
+ * @param {string} [options.revision] Exact Git HEAD required for a reproducible oracle.
  * @param {string[]} [options.argv]    Defaults to `process.argv`.
  */
-export function resolveCheckout({ flag, env, what, repository, argv = process.argv }) {
+export function resolveCheckout({
+  flag,
+  env,
+  what,
+  repository,
+  revision,
+  argv = process.argv,
+}) {
   const index = argv.indexOf(flag);
   const fromFlag = index !== -1 ? argv[index + 1] : undefined;
   const path = fromFlag ?? process.env[env];
@@ -40,6 +49,23 @@ export function resolveCheckout({ flag, env, what, repository, argv = process.ar
     process.exit(2);
   }
 
+  if (revision) {
+    let actual;
+    try {
+      actual = execFileSync('git', ['-C', path, 'rev-parse', 'HEAD'], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      }).trim();
+    } catch {
+      console.error(`Cannot read ${what} Git revision at ${path}.`);
+      process.exit(2);
+    }
+    if (actual !== revision) {
+      console.error(`${what} revision mismatch: expected ${revision}, got ${actual}.`);
+      process.exit(2);
+    }
+  }
+
   return path;
 }
 
@@ -47,10 +73,12 @@ export function resolveCheckout({ flag, env, what, repository, argv = process.ar
 export const FLIX_COMPILER = {
   what: 'the Flix compiler',
   repository: 'https://github.com/flix/flix',
+  revision: '36d923ca325dc466b28c63419667e6026a80f920',
 };
 
 /** The sibling tree-sitter grammar, used as an independent tokenization oracle. */
 export const TREE_SITTER_FLIX = {
   what: 'tree-sitter-flix',
   repository: 'https://github.com/wstein/tree-sitter-flix',
+  revision: 'b120a7ad3072a3d17ac02ac8571e8f42a368aaad',
 };

@@ -129,4 +129,20 @@
 #          ^ source.flix keyword.operator.flix
 #           ^ source.flix
 #            ^ source.flix constant.numeric.flix
+>    law lawful
+#^^^^^^^^^^^^^^^ source.flix
+>    @LoweringTargetChannel @LoweringTargetDatalog
+#^^^^ source.flix
+#    ^ source.flix storage.type.annotation.flix punctuation.definition.annotation.flix
+#     ^^^^^^^^^^^^^^^^^^^^^ source.flix storage.type.annotation.flix
+#                          ^ source.flix
+#                           ^ source.flix storage.type.annotation.flix punctuation.definition.annotation.flix
+#                            ^^^^^^^^^^^^^^^^^^^^^ source.flix storage.type.annotation.flix
+>    @Export @LoweringTarget
+#^^^^ source.flix
+#    ^ source.flix storage.type.annotation.flix punctuation.definition.annotation.flix
+#     ^^^^^^ source.flix storage.type.annotation.flix
+#           ^ source.flix
+#            ^ source.flix storage.type.annotation.flix punctuation.definition.annotation.flix
+#             ^^^^^^^^^^^^^^ source.flix storage.type.annotation.flix
 >
