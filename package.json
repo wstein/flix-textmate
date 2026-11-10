@@ -29,7 +29,7 @@
     "build": "node src/typescript/GenerateTmLanguageFile.ts",
     "check:build": "npm run build && git diff --exit-code -- syntaxes/flix.tmLanguage.json",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint . && npm run lint:grammar && npm run check:scopes && npm run check:badges",
+    "lint": "eslint . && npm run lint:grammar && npm run check:scopes && npm run check:badges && npm run check:pin",
     "lint:grammar": "node scripts/lint-grammar.mjs",
     "fmt": "prettier --write . && eslint --fix .",
     "fmt:check": "prettier --check .",
@@ -46,7 +46,8 @@
     "check:lexicon": "node scripts/extract-lexicon.mjs && git diff --exit-code -- src/typescript/lexicon.generated.ts",
     "check:scopes": "node scripts/check-scopes-documented.mjs",
     "check:badges": "node scripts/check-badges.mjs",
-    "check:boundaries": "node scripts/check-token-boundaries.mjs"
+    "check:boundaries": "node scripts/check-token-boundaries.mjs",
+    "check:pin": "node scripts/check-flix-pin.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

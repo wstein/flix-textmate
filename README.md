@@ -196,6 +196,7 @@ other pull request.
 
 - [`docs/SCOPES.md`](docs/SCOPES.md) — every scope, and why it is what it is.
 - [`docs/SCOPE-MAPPING.md`](docs/SCOPE-MAPPING.md) — correspondence with `tree-sitter-flix`.
+- [`docs/LEXICAL-SOURCE.md`](docs/LEXICAL-SOURCE.md) — source pin, CI regeneration, and vocabulary limits.
 - [`docs/DEFECTS.md`](docs/DEFECTS.md) — what is wrong with the grammar this replaces.
 
 ## Licence
@@ -211,7 +212,7 @@ oracle is tree-sitter-flix at `b120a7ad3072a3d17ac02ac8571e8f42a368aaad`
 ([migration PR #11](https://github.com/wstein/tree-sitter-flix/pull/11));
 this pin does not imply that the PR has merged. External checks reject another HEAD.
 
-Flix 0.79 removes the keywords `law` and `lawful`. Neither those names nor a
+The Flix 0.79 inventory excludes the retired keywords `law` and `lawful`. Neither those names nor a
 following name receive declaration scopes. Operators and primitive types are unchanged.
 The accepted annotation inventory removes `Export` and replaces `LoweringTarget` with
 `LoweringTargetChannel` and `LoweringTargetDatalog`. Annotation highlighting remains

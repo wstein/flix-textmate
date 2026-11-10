@@ -8,7 +8,7 @@
  * had (`dbg`, `typematch`, `resume`, `branch`, `jumpto`, `without`, `opaque`) while missing
  * sixteen it does (`Array#`, `Static`, `Univ`, `open_variant`, …). See docs/DEFECTS.md.
  *
- * The generated file is committed, so CI does not need a compiler checkout. Re-run this
+ * The generated file is committed; CI regenerates it from pinned compiler sources. Re-run this
  * after updating the Flix source and commit the result:
  *
  *   npm run extract:lexicon -- --flix-source <path-to-flix-checkout>
