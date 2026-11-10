@@ -72,8 +72,9 @@ keywords that are not in `Lexer.Keywords` (`dbg`, `typematch`, `resume`, `branch
   _definition_ of our published artifact buys little and risks churn. `ScopeName` is
   `` `${string}.flix` ``, which makes an unsuffixed scope a compile error.
 - `src/typescript/lexicon.generated.ts` — keywords, operators, simple tokens, and
-  annotation names extracted from the compiler by `scripts/extract-lexicon.mjs`. Committed,
-  so CI needs no compiler checkout. Never hand-edit; re-run the extractor. It is excluded
+  annotation names extracted from the compiler by `scripts/extract-lexicon.mjs`. Committed;
+  CI regenerates it from a checkout of the pinned compiler sources. Never hand-edit;
+  re-run the extractor. It is excluded
   from Prettier on purpose: reformatting a generated file makes the committed copy stop
   matching what its generator emits, so every regeneration would dirty the tree.
   `npm run check:lexicon` catches that.
