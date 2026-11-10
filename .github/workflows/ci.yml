@@ -15,9 +15,9 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 22
           cache: npm
@@ -38,11 +38,24 @@ jobs:
       - name: Grammar is up to date
         run: npm run check:build
 
-      # The lexicon manifest is generated and committed. Prettier is configured not to
-      # touch it, because reformatting a generated file makes the committed copy stop
-      # matching what its generator emits.
-      - name: Lexicon manifest is unmodified
-        run: git diff --exit-code -- src/typescript/lexicon.generated.ts
+      # Use the same authority as check:pin and the extractor's actual-HEAD check.
+      - name: Read compiler source revision
+        id: compiler
+        run: node --input-type=module -e "import { FLIX_COMPILER } from './scripts/external-checkout.mjs'; console.log('revision=' + FLIX_COMPILER.revision)" >> "$GITHUB_OUTPUT"
+
+      - name: Check out pinned compiler sources
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: flix/flix
+          ref: ${{ steps.compiler.outputs.revision }}
+          path: .flix-source
+          persist-credentials: false
+
+      # Regenerate before diffing: a diff on a clean checkout cannot detect stale data.
+      - name: Lexicon matches pinned compiler sources
+        env:
+          FLIX_SOURCE: .flix-source
+        run: npm run check:lexicon
 
       - name: Unit tests
         run: npm run test:unit
