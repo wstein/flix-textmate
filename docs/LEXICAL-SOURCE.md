@@ -13,12 +13,24 @@ comparing the file. Neither check compiles the compiler. To change the source,
 update the authority, regenerate from the matching checkout, and review the
 inventory and grammar tests together.
 
+CI also checks the independently maintained `pin.json` from flix-spec commit
+`821d89625717e2789118b0fdb34040ddc649d1cc`. Its `upstream.commit` must equal the
+compiler authority and the lexicon stamp. The producer revision is a separate
+input, not another local compiler declaration; update it deliberately when the
+source contract changes. CI fetches only this metadata and runs no spec build.
+Locally, `npm run check:pin -- --flix-spec <checkout>` (or `FLIX_SPEC`) preserves
+the branch's optional cross-repository check. `--spec-pin <pin.json>` or
+`FLIX_SPEC_PIN` accepts a metadata file directly. Without either input, the command
+reports that cross-repository equality was not checked; a configured unreadable,
+malformed, incomplete, or mismatched pin fails.
+
 ## Scope of the vocabulary
 
 The generator reads spelling tables from `Lexer.scala`, annotation names from
 `Weeder2.scala`, and primitive type names from `Resolver.scala`. It does not
 consume flix-spec inventories or claim tree, token-kind, or diagnostic
-conformance. A separate flix-spec checkout is therefore not a CI input.
+conformance. The only flix-spec CI input is its independently pinned source
+metadata, which checks compiler identity rather than vocabulary semantics.
 
 The `law` and `lawful` keywords were removed in Flix 0.75.2. Their removal and
 the absent `Export` annotation are already reflected in the 0.79 inventory and tests. The annotation rule stays

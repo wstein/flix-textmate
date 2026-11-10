@@ -17,6 +17,17 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
+      # Only pin.json is consumed; no compiler, fixture, or runner build is needed.
+      - name: Check out independent flix-spec pin metadata
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: wstein/flix-spec
+          ref: 821d89625717e2789118b0fdb34040ddc649d1cc
+          path: .flix-spec
+          sparse-checkout: pin.json
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: 22
@@ -31,6 +42,8 @@ jobs:
         run: npm run fmt:check
 
       - name: Lint
+        env:
+          FLIX_SPEC: .flix-spec
         run: npm run lint
 
       # Fails if syntaxes/flix.tmLanguage.json differs from what the TypeScript
