@@ -109,6 +109,7 @@ const KEYWORD_SCOPES: Record<Keyword, ScopeName> = {
   mod: 'storage.type.flix',
   restrictable: 'storage.type.flix',
   let: 'storage.type.flix',
+  val: 'storage.type.flix',
 
   pub: 'storage.modifier.flix',
   sealed: 'storage.modifier.flix',

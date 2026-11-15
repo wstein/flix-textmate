@@ -1,6 +1,6 @@
 # Lexical source contract
 
-The Flix 0.79.0 compiler at `36d923ca325dc466b28c63419667e6026a80f920`
+The Flix 0.80.0 compiler at `0c641c73c4635dee992d01c4364f224ea56d9a46`
 is the source of the committed lexical inventory. `FLIX_COMPILER.revision` in
 `scripts/external-checkout.mjs` is the executable authority; there is no second
 `flix-pin.json` declaration to update independently.
@@ -14,10 +14,9 @@ update the authority, regenerate from the matching checkout, and review the
 inventory and grammar tests together.
 
 CI also checks the independently maintained `pin.json` from flix-spec commit
-`821d89625717e2789118b0fdb34040ddc649d1cc`. Its `upstream.commit` must equal the
-compiler authority and the lexicon stamp. The producer revision is a separate
-input, not another local compiler declaration; update it deliberately when the
-source contract changes. CI fetches only this metadata and runs no spec build.
+`34630fe87450c0c2d52c4543b68de97c99a46920` (the merged 0.80 source in flix-spec PR #23). Its `upstream.commit` must equal the compiler
+authority and the lexicon stamp. The producer revision is a separate input, not
+another local compiler declaration. CI fetches only this metadata and runs no spec build.
 Locally, `npm run check:pin -- --flix-spec <checkout>` (or `FLIX_SPEC`) preserves
 the branch's optional cross-repository check. `--spec-pin <pin.json>` or
 `FLIX_SPEC_PIN` accepts a metadata file directly. Without either input, the command
@@ -33,7 +32,7 @@ conformance. The only flix-spec CI input is its independently pinned source
 metadata, which checks compiler identity rather than vocabulary semantics.
 
 The `law` and `lawful` keywords were removed in Flix 0.75.2. Their removal and
-the absent `Export` annotation are already reflected in the 0.79 inventory and tests. The annotation rule stays
+the absent `Export` annotation are already reflected in the 0.80 inventory and tests. The annotation rule stays
 open: `@` followed by ASCII letters receives annotation scopes, including Java
 interop and unknown names. An accepted-name inventory measures coverage and
 cannot establish annotation validity.
