@@ -435,7 +435,7 @@
           "name": "storage.modifier.flix"
         },
         {
-          "match": "(?<![A-Za-z0-9_!$])(?:restrictable|instance|struct|alias|redef|trait|enum|type|def|eff|let|mod)(?![A-Za-z0-9_!$])",
+          "match": "(?<![A-Za-z0-9_!$])(?:restrictable|instance|struct|alias|redef|trait|enum|type|def|eff|let|mod|val)(?![A-Za-z0-9_!$])",
           "name": "storage.type.flix"
         },
         {

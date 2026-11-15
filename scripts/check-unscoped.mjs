@@ -50,6 +50,8 @@ const MUST_BE_UNSCOPED = [
   { text: 'case_', why: '`_` is a name character' },
   { text: 'xor1', why: 'a digit is a name character' },
   { text: 'defer', why: 'merely starts with `def`' },
+  { text: 'valve', why: 'merely starts with `val`' },
+  { text: 'val!', subject: 'val', why: '`!` is a name character' },
   { text: 'iffy', why: 'merely starts with `if`' },
   { text: 'newtype', why: 'merely starts with `new`' },
   // Malformed literals. `Lexer.isNumberLikeChar` folds any trailing `[0-9A-Za-z_.]` into

@@ -129,7 +129,7 @@ other gate answers "does a scope exist"; only this one can answer "is it on the 
 characters".
 
 `audit` enforces two things: no file may end with a rule still open (a hard gate — currently
-zero across 894 files), and scope coverage may not fall below `tests/corpus-baseline.json`.
+zero across 895 files), and scope coverage may not fall below `tests/corpus-baseline.json`.
 Coverage is a **ratchet, not a target**: this grammar deliberately leaves expression-position
 identifiers bare, so chasing the number would mean inventing the heuristics it refuses to
 ship. That is also why the coverage badge above is a fact, not a goal.
@@ -204,21 +204,22 @@ other pull request.
 Apache License 2.0. The grammar carries forward the copyright notice of the upstream
 `flix/textmate` grammar it replaces.
 
-### Flix 0.79 source baseline
+### Flix 0.80 source baseline
 
-The lexical inventory and corpus checks require Flix v0.79.0 at
-`36d923ca325dc466b28c63419667e6026a80f920`. The boundary and scope-mapping
+The lexical inventory and corpus checks require Flix v0.80.0 at
+`0c641c73c4635dee992d01c4364f224ea56d9a46`. The boundary and scope-mapping
 oracle is tree-sitter-flix at `b120a7ad3072a3d17ac02ac8571e8f42a368aaad`
 ([migration PR #11](https://github.com/wstein/tree-sitter-flix/pull/11));
 this pin does not imply that the PR has merged. External checks reject another HEAD.
 
-The Flix 0.79 inventory excludes the retired keywords `law` and `lawful`. Neither those names nor a
+The Flix 0.80 inventory includes `val` as a keyword and excludes the retired keywords `law` and `lawful`. Neither those names nor a
 following name receive declaration scopes. Operators and primitive types are unchanged.
 The accepted annotation inventory removes `Export` and replaces `LoweringTarget` with
 `LoweringTargetChannel` and `LoweringTargetDatalog`. Annotation highlighting remains
 lexical: every `@` followed by ASCII letters is highlighted, including unknown names.
 
-The refreshed corpus contains 894 files, with 65.79% coverage and 64 scopes.
+The 0.80 corpus has 895 files, 65.79% coverage and 64 scopes; no file ends in an open rule.
+The earlier 0.79 corpus contained 894 files, with 65.79% coverage and 64 scopes.
 Both the original grammar at `ead9878a26cae5b2568768eddbd6f5c0789ba69e` and
 the migrated grammar measure 65.79% on these same 5,218,078 non-whitespace
 characters, with zero files ending in an open rule.

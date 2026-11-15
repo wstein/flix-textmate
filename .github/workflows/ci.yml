@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: wstein/flix-spec
-          ref: 821d89625717e2789118b0fdb34040ddc649d1cc
+          ref: 34630fe87450c0c2d52c4543b68de97c99a46920
           path: .flix-spec
           sparse-checkout: pin.json
           sparse-checkout-cone-mode: false

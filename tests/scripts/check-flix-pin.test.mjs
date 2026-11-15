@@ -11,7 +11,9 @@ import {
   resolveSpecPinPath,
 } from '../../scripts/check-flix-pin.mjs';
 
-const revision = '36d923ca325dc466b28c63419667e6026a80f920';
+import { FLIX_COMPILER } from '../../scripts/external-checkout.mjs';
+
+const revision = FLIX_COMPILER.revision;
 const stamp = `// Source: flix/flix @ ${revision}`;
 
 for (const newline of ['\n', '\r\n']) {

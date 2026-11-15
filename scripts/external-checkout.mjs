@@ -73,7 +73,7 @@ export function resolveCheckout({
 export const FLIX_COMPILER = {
   what: 'the Flix compiler',
   repository: 'https://github.com/flix/flix',
-  revision: '36d923ca325dc466b28c63419667e6026a80f920',
+  revision: '0c641c73c4635dee992d01c4364f224ea56d9a46',
 };
 
 /** The sibling tree-sitter grammar, used as an independent tokenization oracle. */
