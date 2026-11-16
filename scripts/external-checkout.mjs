@@ -80,5 +80,5 @@ export const FLIX_COMPILER = {
 export const TREE_SITTER_FLIX = {
   what: 'tree-sitter-flix',
   repository: 'https://github.com/wstein/tree-sitter-flix',
-  revision: 'b120a7ad3072a3d17ac02ac8571e8f42a368aaad',
+  revision: '377841bfbedcd10d818e213b8b8e34c51d081119',
 };
