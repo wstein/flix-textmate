@@ -208,8 +208,8 @@ Apache License 2.0. The grammar carries forward the copyright notice of the upst
 
 The lexical inventory and corpus checks require Flix v0.80.0 at
 `0c641c73c4635dee992d01c4364f224ea56d9a46`. The boundary and scope-mapping
-oracle is tree-sitter-flix at `b120a7ad3072a3d17ac02ac8571e8f42a368aaad`
-([migration PR #11](https://github.com/wstein/tree-sitter-flix/pull/11));
+oracle is tree-sitter-flix at `377841bfbedcd10d818e213b8b8e34c51d081119`
+([migration PR #13](https://github.com/wstein/tree-sitter-flix/pull/13));
 this pin does not imply that the PR has merged. External checks reject another HEAD.
 
 The Flix 0.80 inventory includes `val` as a keyword and excludes the retired keywords `law` and `lawful`. Neither those names nor a
