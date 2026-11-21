@@ -29,7 +29,14 @@ contributed upstream unchanged.
 ## Using the grammar
 
 The artifact is the single file [`syntaxes/flix.tmLanguage.json`](syntaxes/flix.tmLanguage.json).
-It has no runtime dependencies and is not published to npm, so vendor it from a tag:
+It has no runtime dependencies. Install the npm package once the first release is
+published, or vendor the JSON from a Git tag.
+
+```bash
+npm install flix-textmate
+```
+
+To vendor from Git:
 
 ```bash
 curl -fsSLO https://raw.githubusercontent.com/wstein/flix-textmate/v0.1.1/syntaxes/flix.tmLanguage.json
@@ -56,9 +63,12 @@ repository's own tests tokenize with — takes it as a language:
 
 ```js
 import { createHighlighter } from 'shiki';
-import flix from './flix.tmLanguage.json' with { type: 'json' };
+import flix from 'flix-textmate' with { type: 'json' };
 
-const highlighter = await createHighlighter({ langs: [flix], themes: ['github-dark'] });
+const highlighter = await createHighlighter({
+  langs: [{ ...flix, name: 'flix' }],
+  themes: ['github-dark'],
+});
 highlighter.codeToHtml(source, { lang: 'flix', theme: 'github-dark' });
 ```
 
@@ -176,6 +186,19 @@ overlap the columns it points at.
 A negative assertion needs care: `vscode-tmgrammar-test` compares scopes by exact string
 equality, so `- keyword` passes against `keyword.control.flix` and proves nothing. Cases of
 the form "this must _not_ be highlighted" belong in `scripts/check-unscoped.mjs`.
+
+## npm releases
+
+Run [Prepare and publish npm package][npm-workflow] on `main` with
+`publish_npm` off to build and test a tarball. For the first release,
+download the `npm-package` artifact, extract it, and run
+`npm publish ./flix-textmate-*.tgz --access public` with an npm account that can
+publish the package. Then configure an npm [trusted publisher][npm-trusted] for
+`wstein/flix-textmate`, workflow filename `npm-publish.yml`, environment `npm`.
+Use the workflow with `publish_npm` on for subsequent releases.
+
+[npm-workflow]: https://github.com/wstein/flix-textmate/actions/workflows/npm-publish.yml
+[npm-trusted]: https://docs.npmjs.com/trusted-publishers/
 
 ## Contributing
 

@@ -3,7 +3,6 @@
   "version": "0.1.1",
   "description": "TextMate grammar for the Flix programming language",
   "type": "module",
-  "private": true,
   "license": "Apache-2.0",
   "author": {
     "name": "Werner Stein",
@@ -22,6 +21,7 @@
   "engines": {
     "node": ">=22.18.0"
   },
+  "exports": "./syntaxes/flix.tmLanguage.json",
   "files": [
     "syntaxes/flix.tmLanguage.json"
   ],
