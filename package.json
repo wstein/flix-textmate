@@ -1,6 +1,6 @@
 {
   "name": "flix-textmate",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "TextMate grammar for the Flix programming language",
   "type": "module",
   "license": "Apache-2.0",
