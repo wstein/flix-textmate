@@ -29,17 +29,17 @@ contributed upstream unchanged.
 ## Using the grammar
 
 The artifact is the single file [`syntaxes/flix.tmLanguage.json`](syntaxes/flix.tmLanguage.json).
-It has no runtime dependencies. Install the npm package once the first release is
-published, or vendor the JSON from a Git tag.
+It has no runtime dependencies. Install the published npm package, or vendor the JSON
+from a Git tag.
 
 ```bash
 npm install flix-textmate
 ```
 
-To vendor from Git:
+To vendor from Git (pin the current release tag):
 
 ```bash
-curl -fsSLO https://raw.githubusercontent.com/wstein/flix-textmate/v0.1.1/syntaxes/flix.tmLanguage.json
+curl -fsSLO https://raw.githubusercontent.com/wstein/flix-textmate/v0.1.2/syntaxes/flix.tmLanguage.json
 ```
 
 A VS Code extension contributes it against the `flix` language identifier:
@@ -189,13 +189,12 @@ the form "this must _not_ be highlighted" belong in `scripts/check-unscoped.mjs`
 
 ## npm releases
 
-Run [Prepare and publish npm package][npm-workflow] on `main` with
-`publish_npm` off to build and test a tarball. For the first release,
-download the `npm-package` artifact, extract it, and run
-`npm publish ./flix-textmate-*.tgz --access public` with an npm account that can
-publish the package. Then configure an npm [trusted publisher][npm-trusted] for
-`wstein/flix-textmate`, workflow filename `npm-publish.yml`, environment `npm`.
-Use the workflow with `publish_npm` on for subsequent releases.
+The package is published on npm as [`flix-textmate`](https://www.npmjs.com/package/flix-textmate)
+(current latest: **0.1.2**). Run [Prepare and publish npm package][npm-workflow] on
+`main` with `publish_npm` off to build and test a tarball without publishing.
+Use the same workflow with `publish_npm` on to release the next version through
+npm [trusted publishing][npm-trusted] (`wstein/flix-textmate`, workflow
+`npm-publish.yml`, environment `npm`).
 
 [npm-workflow]: https://github.com/wstein/flix-textmate/actions/workflows/npm-publish.yml
 [npm-trusted]: https://docs.npmjs.com/trusted-publishers/
